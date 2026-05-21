@@ -45,6 +45,21 @@ type User struct {
 	Verified bool   `json:"verified"`
 }
 
+type VM struct {
+	UID           string `json:"uid"`
+	Name          string `json:"name"`
+	Slug          string `json:"slug"`
+	Kind          string `json:"kind"`
+	Status        string `json:"status"`
+	DisplayStatus string `json:"display_status"`
+	PlanSlug      string `json:"plan_slug,omitempty"`
+	VCPU          int    `json:"vcpu,omitempty"`
+	MemoryMiB     int    `json:"memory_mib,omitempty"`
+	ImageSlug     string `json:"image_slug,omitempty"`
+	ZoneSlug      string `json:"zone_slug"`
+	DiskGiB       int    `json:"disk_gib"`
+}
+
 type Workspace struct {
 	UID         string `json:"uid"`
 	Name        string `json:"name"`
