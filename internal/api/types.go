@@ -45,6 +45,28 @@ type User struct {
 	Verified bool   `json:"verified"`
 }
 
+type Operation struct {
+	UID          string `json:"uid"`
+	ResourceType string `json:"resource_type"`
+	ResourceUID  string `json:"resource_uid"`
+	ResourceName string `json:"resource_name"`
+	Action       string `json:"action"`
+	Status       string `json:"status"`
+	CreatedAt    string `json:"created_at"`
+	EventsURL    string `json:"events_url"`
+}
+
+type VMOperationResult struct {
+	OperationID string `json:"operation_id"`
+	VMUID       string `json:"vm_uid"`
+	Name        string `json:"name"`
+	Action      string `json:"action"`
+	Status      string `json:"status"`
+	EventsURL   string `json:"events_url"`
+	IsReplay    bool   `json:"is_replay"`
+	IsCompleted bool   `json:"is_completed,omitempty"`
+}
+
 type VM struct {
 	UID           string `json:"uid"`
 	Name          string `json:"name"`
@@ -56,6 +78,7 @@ type VM struct {
 	VCPU          int    `json:"vcpu,omitempty"`
 	MemoryMiB     int    `json:"memory_mib,omitempty"`
 	ImageSlug     string `json:"image_slug,omitempty"`
+	ImageName     string `json:"image_name,omitempty"`
 	ZoneSlug      string `json:"zone_slug"`
 	DiskGiB       int    `json:"disk_gib"`
 }

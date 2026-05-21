@@ -32,6 +32,7 @@ func TestList_printsVMs(t *testing.T) {
 			VCPU:          1,
 			MemoryMiB:     1024,
 			DiskGiB:       20,
+			ImageName:     "Ubuntu 24.04 LTS",
 		},
 		{Name: "Dev box", Slug: "dev-box", Status: "stopped", Kind: "persistent", DiskGiB: 10, ZoneSlug: "olas-closet"},
 	}, nil)
@@ -49,6 +50,7 @@ func TestList_printsVMs(t *testing.T) {
 	assert.Contains(t, s, "SPEC")
 	assert.Contains(t, s, "test-vm7")
 	assert.Contains(t, s, "micro · 1 vCPU")
+	assert.Contains(t, s, "Ubuntu 24.04 LTS")
 	assert.Contains(t, s, "stopped")
 }
 

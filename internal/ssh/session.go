@@ -7,6 +7,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -19,6 +20,7 @@ import (
 	"github.com/Sanmo-Labs/rumpty-cli/internal/api"
 	"github.com/Sanmo-Labs/rumpty-cli/internal/app"
 	rumptylog "github.com/Sanmo-Labs/rumpty-cli/internal/log"
+	"github.com/Sanmo-Labs/rumpty-cli/internal/term"
 )
 
 type ExitError struct {
@@ -41,12 +43,19 @@ type Options struct {
 }
 
 func Open(ctx context.Context, rt *app.Runtime, vm string, opts Options) error {
+	var spin *term.Spinner
+	if !opts.Debug {
+		spin = term.StartSpinner(stderr(rt), "Connecting...")
+	}
+
 	key, err := NewKeyPair()
 	if err != nil {
+		stopSpinner(spin)
 		return err
 	}
 	pubLine, err := key.AuthorizedKeyLine()
 	if err != nil {
+		stopSpinner(spin)
 		return err
 	}
 
@@ -57,10 +66,24 @@ func Open(ctx context.Context, rt *app.Runtime, vm string, opts Options) error {
 		PublicKey: pubLine,
 	})
 	if err != nil {
+		stopSpinner(spin)
 		return err
 	}
 	rumptylog.Debug("connecting with ssh", "host", session.EdgeHost, "port", session.EdgePort, "router_user", session.RouterUser)
-	return Dial(ctx, &session, key, opts)
+	return Dial(ctx, &session, key, opts, spin)
+}
+
+func stderr(rt *app.Runtime) io.Writer {
+	if rt.Streams.ErrOut != nil {
+		return rt.Streams.ErrOut
+	}
+	return os.Stderr
+}
+
+func stopSpinner(spin *term.Spinner) {
+	if spin != nil {
+		spin.Stop()
+	}
 }
 
 func NewKeyPair() (KeyPair, error) {
@@ -79,7 +102,7 @@ func (k KeyPair) AuthorizedKeyLine() (string, error) {
 	return strings.TrimSpace(string(ssh.MarshalAuthorizedKey(sshPublicKey))), nil
 }
 
-func Dial(ctx context.Context, session *api.CertResponse, key KeyPair, opts Options) error {
+func Dial(ctx context.Context, session *api.CertResponse, key KeyPair, opts Options, spin *term.Spinner) error {
 	dir, err := os.MkdirTemp("", "rumpty-ssh-*")
 	if err != nil {
 		return err
@@ -127,9 +150,15 @@ func Dial(ctx context.Context, session *api.CertResponse, key KeyPair, opts Opti
 		)
 	}
 	args = append(args, session.Username+"@"+session.VMSlug)
+
 	cmd := exec.CommandContext(ctx, "ssh", args...)
 	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
+	stdout := io.Writer(os.Stdout)
+	if spin != nil {
+		defer spin.Stop()
+		stdout = term.StopSpinnerOnWrite(os.Stdout, spin)
+	}
+	cmd.Stdout = stdout
 	cmd.Stderr = os.Stderr
 
 	if err := cmd.Run(); err != nil {

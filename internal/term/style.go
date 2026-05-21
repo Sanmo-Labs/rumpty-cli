@@ -15,6 +15,11 @@ const (
 	ansiUnderline = "\033[4m"
 )
 
+// IsInteractive reports whether w is a terminal suitable for spinners and styling.
+func IsInteractive(w io.Writer) bool {
+	return colorEnabled(w)
+}
+
 func colorEnabled(w io.Writer) bool {
 	if os.Getenv("NO_COLOR") != "" {
 		return false
