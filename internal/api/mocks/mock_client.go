@@ -41,6 +41,36 @@ func (m *MockClientAPI) EXPECT() *MockClientAPIMockRecorder {
 	return m.recorder
 }
 
+// DeleteVM mocks base method.
+func (m *MockClientAPI) DeleteVM(ctx context.Context, workspace, vmUID, idempotency string) (api.VMOperationResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteVM", ctx, workspace, vmUID, idempotency)
+	ret0, _ := ret[0].(api.VMOperationResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteVM indicates an expected call of DeleteVM.
+func (mr *MockClientAPIMockRecorder) DeleteVM(ctx, workspace, vmUID, idempotency any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteVM", reflect.TypeOf((*MockClientAPI)(nil).DeleteVM), ctx, workspace, vmUID, idempotency)
+}
+
+// GetOperation mocks base method.
+func (m *MockClientAPI) GetOperation(ctx context.Context, workspace, operationID string) (api.Operation, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetOperation", ctx, workspace, operationID)
+	ret0, _ := ret[0].(api.Operation)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetOperation indicates an expected call of GetOperation.
+func (mr *MockClientAPIMockRecorder) GetOperation(ctx, workspace, operationID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOperation", reflect.TypeOf((*MockClientAPI)(nil).GetOperation), ctx, workspace, operationID)
+}
+
 // IssueSSHCert mocks base method.
 func (m *MockClientAPI) IssueSSHCert(ctx context.Context, workspace string, req api.CertRequest) (api.CertResponse, error) {
 	m.ctrl.T.Helper()
@@ -130,6 +160,21 @@ func (mr *MockClientAPIMockRecorder) PollDeviceToken(ctx, deviceCode any) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PollDeviceToken", reflect.TypeOf((*MockClientAPI)(nil).PollDeviceToken), ctx, deviceCode)
 }
 
+// RebootVM mocks base method.
+func (m *MockClientAPI) RebootVM(ctx context.Context, workspace, vmUID, idempotency string) (api.VMOperationResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RebootVM", ctx, workspace, vmUID, idempotency)
+	ret0, _ := ret[0].(api.VMOperationResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RebootVM indicates an expected call of RebootVM.
+func (mr *MockClientAPIMockRecorder) RebootVM(ctx, workspace, vmUID, idempotency any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RebootVM", reflect.TypeOf((*MockClientAPI)(nil).RebootVM), ctx, workspace, vmUID, idempotency)
+}
+
 // StartDevice mocks base method.
 func (m *MockClientAPI) StartDevice(ctx context.Context) (api.DeviceAuthStartResponse, error) {
 	m.ctrl.T.Helper()
@@ -143,4 +188,34 @@ func (m *MockClientAPI) StartDevice(ctx context.Context) (api.DeviceAuthStartRes
 func (mr *MockClientAPIMockRecorder) StartDevice(ctx any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartDevice", reflect.TypeOf((*MockClientAPI)(nil).StartDevice), ctx)
+}
+
+// StartVM mocks base method.
+func (m *MockClientAPI) StartVM(ctx context.Context, workspace, vmUID, idempotency string) (api.VMOperationResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "StartVM", ctx, workspace, vmUID, idempotency)
+	ret0, _ := ret[0].(api.VMOperationResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// StartVM indicates an expected call of StartVM.
+func (mr *MockClientAPIMockRecorder) StartVM(ctx, workspace, vmUID, idempotency any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartVM", reflect.TypeOf((*MockClientAPI)(nil).StartVM), ctx, workspace, vmUID, idempotency)
+}
+
+// StopVM mocks base method.
+func (m *MockClientAPI) StopVM(ctx context.Context, workspace, vmUID, idempotency string) (api.VMOperationResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "StopVM", ctx, workspace, vmUID, idempotency)
+	ret0, _ := ret[0].(api.VMOperationResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// StopVM indicates an expected call of StopVM.
+func (mr *MockClientAPIMockRecorder) StopVM(ctx, workspace, vmUID, idempotency any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StopVM", reflect.TypeOf((*MockClientAPI)(nil).StopVM), ctx, workspace, vmUID, idempotency)
 }

@@ -55,6 +55,20 @@ func (c *Client) post(ctx context.Context, path string, body any, out any, opts 
 	return decodeEnvelope(resp, out)
 }
 
+func (c *Client) deleteWithOptions(ctx context.Context, path string, out any, opts requestOptions) error {
+	req := c.r.R().SetContext(ctx)
+	for k, v := range opts.headers {
+		req.SetHeader(k, v)
+	}
+	rumptylog.Debug("API request", "method", "DELETE", "path", path)
+	resp, err := req.Delete(path)
+	if err != nil {
+		return fmt.Errorf("delete %s: %w", path, err)
+	}
+	rumptylog.Debug("API response", "method", "DELETE", "path", path, "status", resp.StatusCode())
+	return decodeEnvelope(resp, out)
+}
+
 func (c *Client) get(ctx context.Context, path string, out any) error {
 	return c.getWithOptions(ctx, path, out, requestOptions{})
 }
