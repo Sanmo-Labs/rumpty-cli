@@ -117,6 +117,35 @@ func TestLogin_device_authorization(t *testing.T) {
 	assert.Equal(t, "jwt", creds.Token)
 }
 
+func TestLogin_device_completesWithoutEnter(t *testing.T) {
+	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
+	ctrl := gomock.NewController(t)
+
+	mock := mocks.NewMockClientAPI(ctrl)
+	mock.EXPECT().StartDevice(gomock.Any()).Return(api.DeviceAuthStartResponse{
+		DeviceCode:              "dc-1",
+		UserCode:                "WXYZ-9999",
+		VerificationURI:         "https://app.example/device",
+		VerificationURIComplete: "https://app.example/device?user_code=WXYZ-9999",
+		ExpiresIn:               60,
+		Interval:                1,
+	}, nil)
+	mock.EXPECT().PollDeviceToken(gomock.Any(), "dc-1").Return(api.DeviceAuthPollResponse{
+		Token: "jwt",
+		User:  api.User{Username: "bob"},
+	}, nil)
+
+	pr, pw := io.Pipe()
+	t.Cleanup(func() { _ = pr.Close(); _ = pw.Close() })
+
+	rt, errOut := testRuntime(t, mock, config.Config{APIURL: "https://api.example"})
+	rt.Streams.In = pr
+
+	err := auth.Login(context.Background(), rt, "", auth.LoginOptions{})
+	require.NoError(t, err)
+	assert.Contains(t, errOut.String(), "Logged in as bob")
+}
+
 func TestLogin_device_unexpectedStatus(t *testing.T) {
 	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
 	ctrl := gomock.NewController(t)

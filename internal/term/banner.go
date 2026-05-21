@@ -1,18 +1,21 @@
 package term
 
-import "io"
+import (
+	"io"
+	"strings"
+)
 
 const (
 	rumptyLogotype = `▄▖       ▗   ▄▖▜      ▌
 ▙▘▌▌▛▛▌▛▌▜▘▌▌▌ ▐ ▛▌▌▌▛▌
 ▌▌▙▌▌▌▌▙▌▐▖▙▌▙▖▐▖▙▌▙▌▙▌
        ▌   ▄▌          `
-	rumptyBannerFooter = "Sanmọ̀Labs™. Surpass your limits!"
+	rumptyBannerFooter = "RumptyCloud\nSanmọ̀Labs™ - Surpass your limits!"
 )
 
 func PrintBanner(w io.Writer) {
-	_, _ = io.WriteString(w, rumptyLogotype)
+	_, _ = io.WriteString(w, strings.TrimRight(rumptyLogotype, "\n"))
 	_, _ = io.WriteString(w, "\n\n")
 	_, _ = io.WriteString(w, rumptyBannerFooter)
-	_, _ = io.WriteString(w, "\n\n")
+	_, _ = io.WriteString(w, "\n")
 }

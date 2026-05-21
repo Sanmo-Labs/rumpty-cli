@@ -46,7 +46,7 @@ func TestOpen_issueCertError(t *testing.T) {
 		APIClient: mock,
 	}
 
-	err := rumptyssh.Open(context.Background(), rt, "my-vm", "")
+	err := rumptyssh.Open(context.Background(), rt, "my-vm", rumptyssh.Options{})
 	require.Error(t, err)
 	var apiErr *api.Error
 	require.ErrorAs(t, err, &apiErr)
@@ -71,7 +71,7 @@ func TestOpen_sendsPublicKey(t *testing.T) {
 		Config:    &config.Config{Token: "tok", Workspace: "acme"},
 		APIClient: mock,
 	}
-	_ = rumptyssh.Open(context.Background(), rt, "my-vm", "ubuntu")
+	_ = rumptyssh.Open(context.Background(), rt, "my-vm", rumptyssh.Options{GuestUser: "ubuntu"})
 }
 
 func TestExitError(t *testing.T) {

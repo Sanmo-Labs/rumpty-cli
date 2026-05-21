@@ -13,6 +13,8 @@ import (
 
 func newSSHCmd(rt *app.Runtime) *cobra.Command {
 	var guestUser string
+	var identityFile string
+	var sshDebug bool
 
 	cmd := &cobra.Command{
 		Use:   "ssh <vm>",
@@ -27,7 +29,11 @@ Run rumpty login first, or set $RUMPTY_API_KEY for CI and scripts.`,
 			if err := rt.Config.ValidateForSSH(); err != nil {
 				return config.NewUsageError("%v", err)
 			}
-			err := ssh.Open(cmd.Context(), rt, args[0], guestUser)
+			err := ssh.Open(cmd.Context(), rt, args[0], ssh.Options{
+				GuestUser:    guestUser,
+				IdentityFile: identityFile,
+				Debug:        sshDebug,
+			})
 			var exit *ssh.ExitError
 			if errors.As(err, &exit) {
 				os.Exit(exit.Code)
@@ -37,6 +43,8 @@ Run rumpty login first, or set $RUMPTY_API_KEY for CI and scripts.`,
 	}
 
 	cmd.Flags().StringVar(&guestUser, "user", "", "Guest username on the VM")
+	cmd.Flags().StringVarP(&identityFile, "identity", "i", "", "Private key for VM login")
+	cmd.Flags().BoolVar(&sshDebug, "ssh-debug", false, "Enable verbose OpenSSH debugging")
 
 	return cmd
 }
