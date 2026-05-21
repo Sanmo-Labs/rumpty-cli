@@ -8,6 +8,7 @@ import "context"
 type ClientAPI interface {
 	Me(ctx context.Context) (User, error)
 	ListWorkspaces(ctx context.Context) ([]Workspace, error)
+	ListVMs(ctx context.Context, workspace string) ([]VM, error)
 	Logout(ctx context.Context) error
 	StartDevice(ctx context.Context) (DeviceAuthStartResponse, error)
 	PollDeviceToken(ctx context.Context, deviceCode string) (DeviceAuthPollResponse, error)

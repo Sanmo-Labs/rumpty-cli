@@ -56,6 +56,21 @@ func (mr *MockClientAPIMockRecorder) IssueSSHCert(ctx, workspace, req any) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IssueSSHCert", reflect.TypeOf((*MockClientAPI)(nil).IssueSSHCert), ctx, workspace, req)
 }
 
+// ListVMs mocks base method.
+func (m *MockClientAPI) ListVMs(ctx context.Context, workspace string) ([]api.VM, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListVMs", ctx, workspace)
+	ret0, _ := ret[0].([]api.VM)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListVMs indicates an expected call of ListVMs.
+func (mr *MockClientAPIMockRecorder) ListVMs(ctx, workspace any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListVMs", reflect.TypeOf((*MockClientAPI)(nil).ListVMs), ctx, workspace)
+}
+
 // ListWorkspaces mocks base method.
 func (m *MockClientAPI) ListWorkspaces(ctx context.Context) ([]api.Workspace, error) {
 	m.ctrl.T.Helper()

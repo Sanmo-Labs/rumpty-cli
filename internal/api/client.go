@@ -56,8 +56,16 @@ func (c *Client) post(ctx context.Context, path string, body any, out any, opts 
 }
 
 func (c *Client) get(ctx context.Context, path string, out any) error {
+	return c.getWithOptions(ctx, path, out, requestOptions{})
+}
+
+func (c *Client) getWithOptions(ctx context.Context, path string, out any, opts requestOptions) error {
+	req := c.r.R().SetContext(ctx)
+	for k, v := range opts.headers {
+		req.SetHeader(k, v)
+	}
 	rumptylog.Debug("API request", "method", "GET", "path", path)
-	resp, err := c.r.R().SetContext(ctx).Get(path)
+	resp, err := req.Get(path)
 	if err != nil {
 		return fmt.Errorf("get %s: %w", path, err)
 	}
