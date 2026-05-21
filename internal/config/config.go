@@ -56,6 +56,13 @@ func (c *Config) Resolve() {
 	}
 }
 
+func (c *Config) ValidateForAuth() error {
+	if strings.TrimSpace(c.Token) == "" {
+		return fmt.Errorf("missing rumpty login or $%s", EnvToken)
+	}
+	return nil
+}
+
 func (c *Config) ValidateForSSH() error {
 	var missing []string
 	if strings.TrimSpace(c.Token) == "" {

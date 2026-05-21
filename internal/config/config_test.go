@@ -76,6 +76,31 @@ func TestConfig_Resolve_defaultAPIURL(t *testing.T) {
 	assert.Equal(t, config.DefaultAPIURL, cfg.APIURL)
 }
 
+func TestConfig_ValidateForAuth(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name    string
+		cfg     config.Config
+		wantErr string
+	}{
+		{name: "ok when token set", cfg: config.Config{Token: "tok"}},
+		{name: "missing token", cfg: config.Config{}, wantErr: "rumpty login"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.cfg.ValidateForAuth()
+			if tt.wantErr == "" {
+				require.NoError(t, err)
+				return
+			}
+			require.Error(t, err)
+			assert.Contains(t, err.Error(), tt.wantErr)
+		})
+	}
+}
+
 func TestConfig_ValidateForSSH(t *testing.T) {
 	t.Parallel()
 

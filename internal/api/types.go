@@ -44,3 +44,13 @@ type User struct {
 	Email    string `json:"email"`
 	Verified bool   `json:"verified"`
 }
+
+type Workspace struct {
+	UID         string `json:"uid"`
+	Name        string `json:"name"`
+	Slug        string `json:"slug"`
+	Description string `json:"description"`
+	IsDefault   bool   `json:"is_default"`
+	CreatedAt   string `json:"created_at,omitempty"`
+	UpdatedAt   string `json:"updated_at,omitempty"`
+}
