@@ -34,7 +34,13 @@ type KeyPair struct {
 	Private ed25519.PrivateKey
 }
 
-func Open(ctx context.Context, rt *app.Runtime, vm, guestUser string) error {
+type Options struct {
+	GuestUser    string
+	IdentityFile string
+	Debug        bool
+}
+
+func Open(ctx context.Context, rt *app.Runtime, vm string, opts Options) error {
 	key, err := NewKeyPair()
 	if err != nil {
 		return err
@@ -47,14 +53,14 @@ func Open(ctx context.Context, rt *app.Runtime, vm, guestUser string) error {
 	rumptylog.Debug("requesting SSH certificate", "vm", vm, "workspace", rt.Config.Workspace)
 	session, err := rt.API().IssueSSHCert(ctx, rt.Config.Workspace, api.CertRequest{
 		VM:        vm,
-		Username:  strings.TrimSpace(guestUser),
+		Username:  strings.TrimSpace(opts.GuestUser),
 		PublicKey: pubLine,
 	})
 	if err != nil {
 		return err
 	}
-	rumptylog.Debug("connecting with ssh", "host", session.EdgeHost, "port", session.EdgePort)
-	return Dial(ctx, &session, key)
+	rumptylog.Debug("connecting with ssh", "host", session.EdgeHost, "port", session.EdgePort, "router_user", session.RouterUser)
+	return Dial(ctx, &session, key, opts)
 }
 
 func NewKeyPair() (KeyPair, error) {
@@ -73,7 +79,7 @@ func (k KeyPair) AuthorizedKeyLine() (string, error) {
 	return strings.TrimSpace(string(ssh.MarshalAuthorizedKey(sshPublicKey))), nil
 }
 
-func Dial(ctx context.Context, session *api.CertResponse, key KeyPair) error {
+func Dial(ctx context.Context, session *api.CertResponse, key KeyPair, opts Options) error {
 	dir, err := os.MkdirTemp("", "rumpty-ssh-*")
 	if err != nil {
 		return err
@@ -94,13 +100,33 @@ func Dial(ctx context.Context, session *api.CertResponse, key KeyPair) error {
 		return fmt.Errorf("write temporary certificate: %w", err)
 	}
 
-	args := []string{
+	proxyCommand := strings.Join([]string{
+		"ssh",
 		"-i", keyPath,
 		"-o", "CertificateFile=" + certPath,
 		"-o", "IdentitiesOnly=yes",
+		"-o", "RequestTTY=no",
+		"-T",
 		"-p", strconv.Itoa(session.EdgePort),
 		session.RouterUser + "@" + session.EdgeHost,
+	}, " ")
+
+	args := []string{
+		"-o", "ProxyCommand=" + proxyCommand,
+		"-o", "CheckHostIP=no",
+		"-o", "PubkeyAcceptedAlgorithms=+ssh-rsa",
+		"-o", "HostkeyAlgorithms=+ssh-rsa",
 	}
+	if opts.Debug {
+		args = append(args, "-vvv")
+	}
+	if strings.TrimSpace(opts.IdentityFile) != "" {
+		args = append(args,
+			"-i", opts.IdentityFile,
+			"-o", "IdentitiesOnly=yes",
+		)
+	}
+	args = append(args, session.Username+"@"+session.VMSlug)
 	cmd := exec.CommandContext(ctx, "ssh", args...)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
