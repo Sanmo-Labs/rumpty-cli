@@ -7,6 +7,7 @@ import "context"
 //go:generate go run go.uber.org/mock/mockgen@latest -destination=mocks/mock_client.go -package=mocks . ClientAPI
 type ClientAPI interface {
 	Me(ctx context.Context) (User, error)
+	ListWorkspaces(ctx context.Context) ([]Workspace, error)
 	Logout(ctx context.Context) error
 	StartDevice(ctx context.Context) (DeviceAuthStartResponse, error)
 	PollDeviceToken(ctx context.Context, deviceCode string) (DeviceAuthPollResponse, error)

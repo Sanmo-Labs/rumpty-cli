@@ -75,6 +75,7 @@ func NewRoot(rt *app.Runtime) *cobra.Command {
 	cmd.AddCommand(
 		newLoginCmd(rt),
 		newLogoutCmd(rt),
+		newWorkspacesCmd(rt),
 		newSSHCmd(rt),
 	)
 
