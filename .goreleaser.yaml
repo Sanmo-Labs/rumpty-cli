@@ -1,0 +1,57 @@
+version: 2
+
+project_name: rumpty-cli
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: rumpty
+    main: .
+    binary: rumpty
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/Sanmo-Labs/rumpty-cli/internal/version.Version={{ .Version }}
+      - -X github.com/Sanmo-Labs/rumpty-cli/internal/version.Commit={{ .Commit }}
+      - -X github.com/Sanmo-Labs/rumpty-cli/internal/config.DefaultAPIURL=https://api.rumptycloud.com
+      - -X github.com/Sanmo-Labs/rumpty-cli/internal/version.Date={{ .Date }}
+
+archives:
+  - id: rumpty
+    ids:
+      - rumpty
+    formats:
+      - tar.gz
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+checksum:
+  name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+
+release:
+  github:
+    owner: Sanmo-Labs
+    name: rumpty-cli
+  draft: false
+  prerelease: auto

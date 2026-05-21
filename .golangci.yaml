@@ -1,0 +1,85 @@
+version: "2"
+run:
+  allow-parallel-runners: true
+linters:
+  default: none
+  enable:
+    - asasalint
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - containedctx
+    - copyloopvar
+    - durationcheck
+    - errcheck
+    - errchkjson
+    - gocritic
+    - goprintffuncname
+    - gosec
+    - govet
+    - ineffassign
+    - misspell
+    - noctx
+    - nolintlint
+    - revive
+    - staticcheck
+    - unconvert
+    - unused
+    - usestdlibvars
+    - whitespace
+    - testifylint
+  settings:
+    gocritic:
+      disabled-checks:
+        - ifElseChain
+      enabled-tags:
+        - diagnostic
+        - performance
+    gosec:
+      excludes:
+        - G101
+        - G306
+    misspell:
+      ignore-rules:
+        - creater
+    nolintlint:
+      require-specific: true
+      allow-unused: false
+    revive:
+      confidence: 0.6
+      rules:
+        - name: duplicated-imports
+        - name: error-return
+        - name: error-strings
+        - name: error-naming
+        - name: receiver-naming
+        - name: errorf
+        - name: unreachable-code
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - std-error-handling
+    paths:
+      - internal/api/mocks
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+formatters:
+  enable:
+    - gci
+    - gofmt
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(github.com/Sanmo-Labs)
+        - blank
+        - dot
+      custom-order: true
+  exclusions:
+    generated: disable
+    paths:
+      - internal/api/mocks
