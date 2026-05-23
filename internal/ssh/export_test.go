@@ -33,3 +33,23 @@ func PutCertCacheForTest(apiURL, workspace, vmSlug, guestUser string, key KeyPai
 func GetCertCacheForTest(apiURL, workspace, vmSlug, guestUser string) (KeyPair, api.CertResponse, bool) {
 	return sessionCache.get(apiURL, workspace, vmSlug, guestUser)
 }
+
+func BuildRsyncArgsForTest(rsyncSSHWrapper string, session *api.CertResponse, paths CopyPaths, opts *Options) []string {
+	return buildRsyncArgs(rsyncSSHWrapper, session, paths, opts)
+}
+
+func WriteRsyncSSHWrapperForTest(dir, sshBin, proxyCommand string, opts *Options) (string, error) {
+	return writeRsyncSSHWrapper(dir, sshBin, proxyCommand, opts)
+}
+
+func RsyncMissingOnRemoteForTest(output string) bool {
+	return rsyncMissingOnRemote(output)
+}
+
+func CopyRecursiveForTest(paths CopyPaths, flag bool) bool {
+	return copyRecursive(paths, flag)
+}
+
+func BuildSCPArgsForTest(proxyCommand string, session *api.CertResponse, paths CopyPaths, opts *Options, recursive bool) (src, dest string, args []string) {
+	return buildSCPArgs(proxyCommand, session, paths, opts, recursive)
+}

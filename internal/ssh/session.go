@@ -76,22 +76,31 @@ func connect(ctx context.Context, rt *app.Runtime, vmRef string, opts *Options) 
 	}
 	defer stopSpinner(spin)
 
+	key, session, err := obtainSession(ctx, rt, vmRef, opts)
+	if err != nil {
+		return err
+	}
+	rumptylog.Debug("connecting with ssh", "host", session.EdgeHost, "port", session.EdgePort, "router_user", session.RouterUser)
+	return Dial(ctx, &session, key, opts, spin)
+}
+
+func obtainSession(ctx context.Context, rt *app.Runtime, vmRef string, opts *Options) (KeyPair, api.CertResponse, error) {
 	workspace := strings.TrimSpace(rt.Config.Workspace)
 	apiURL := strings.TrimSpace(rt.Config.APIURL)
 	user := guestUser(opts)
 
 	if key, session, ok := sessionCache.get(apiURL, workspace, vmRef, user); ok {
 		rumptylog.Debug("reusing cached ssh certificate", "vm", vmRef, "workspace", workspace)
-		return Dial(ctx, &session, key, opts, spin)
+		return key, session, nil
 	}
 
 	key, err := NewKeyPair()
 	if err != nil {
-		return err
+		return KeyPair{}, api.CertResponse{}, err
 	}
 	pubLine, err := key.AuthorizedKeyLine()
 	if err != nil {
-		return err
+		return KeyPair{}, api.CertResponse{}, err
 	}
 
 	rumptylog.Debug("requesting SSH certificate", "vm", vmRef, "workspace", workspace)
@@ -101,11 +110,10 @@ func connect(ctx context.Context, rt *app.Runtime, vmRef string, opts *Options) 
 		PublicKey: pubLine,
 	})
 	if err != nil {
-		return err
+		return KeyPair{}, api.CertResponse{}, err
 	}
 	sessionCache.put(apiURL, workspace, vmRef, user, key, &session)
-	rumptylog.Debug("connecting with ssh", "host", session.EdgeHost, "port", session.EdgePort, "router_user", session.RouterUser)
-	return Dial(ctx, &session, key, opts, spin)
+	return key, session, nil
 }
 
 func stderr(rt *app.Runtime) io.Writer {
@@ -152,25 +160,11 @@ func Dial(ctx context.Context, session *api.CertResponse, key KeyPair, opts *Opt
 		return err
 	}
 
-	dir, err := os.MkdirTemp("", "rumpty-ssh-*")
+	keyPath, certPath, cleanup, err := writeSessionKeys(key, session)
 	if err != nil {
 		return err
 	}
-	defer os.RemoveAll(dir)
-
-	keyPath := filepath.Join(dir, "id_ed25519")
-	certPath := keyPath + "-cert.pub"
-
-	block, err := ssh.MarshalPrivateKey(key.Private, "rumpty-temporary")
-	if err != nil {
-		return fmt.Errorf("marshal temporary private key: %w", err)
-	}
-	if err := os.WriteFile(keyPath, pem.EncodeToMemory(block), 0o600); err != nil {
-		return fmt.Errorf("write temporary private key: %w", err)
-	}
-	if err := os.WriteFile(certPath, []byte(session.Certificate), 0o600); err != nil {
-		return fmt.Errorf("write temporary certificate: %w", err)
-	}
+	defer cleanup()
 
 	proxyCommand := buildProxyCommand(sshBin, session, keyPath, certPath, opts != nil && opts.Debug)
 	args := buildSSHArgs(proxyCommand, session, opts)
@@ -198,4 +192,30 @@ func wrapRunErr(err error) error {
 		return &ExitError{Code: exitErr.ExitCode()}
 	}
 	return err
+}
+
+func writeSessionKeys(key KeyPair, session *api.CertResponse) (keyPath, certPath string, cleanup func(), err error) {
+	dir, err := os.MkdirTemp("", "rumpty-ssh-*")
+	if err != nil {
+		return "", "", nil, err
+	}
+	cleanup = func() { _ = os.RemoveAll(dir) }
+
+	keyPath = filepath.Join(dir, "id_ed25519")
+	certPath = keyPath + "-cert.pub"
+
+	block, err := ssh.MarshalPrivateKey(key.Private, "rumpty-temporary")
+	if err != nil {
+		cleanup()
+		return "", "", nil, fmt.Errorf("marshal temporary private key: %w", err)
+	}
+	if err := os.WriteFile(keyPath, pem.EncodeToMemory(block), 0o600); err != nil {
+		cleanup()
+		return "", "", nil, fmt.Errorf("write temporary private key: %w", err)
+	}
+	if err := os.WriteFile(certPath, []byte(session.Certificate), 0o600); err != nil {
+		cleanup()
+		return "", "", nil, fmt.Errorf("write temporary certificate: %w", err)
+	}
+	return keyPath, certPath, cleanup, nil
 }
