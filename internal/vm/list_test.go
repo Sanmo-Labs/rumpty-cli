@@ -25,16 +25,16 @@ func TestList_printsVMs(t *testing.T) {
 	mock := mocks.NewMockClientAPI(ctrl)
 	mock.EXPECT().ListVMs(gomock.Any(), "acme").Return([]api.VM{
 		{
-			Name:          "Test VM 7",
-			Slug:          "test-vm7",
+			Slug:          "warm-jollof",
 			DisplayStatus: "running",
-			PlanSlug:      "micro",
-			VCPU:          1,
-			MemoryMiB:     1024,
-			DiskGiB:       20,
-			ImageName:     "Ubuntu 24.04 LTS",
+			PlanSlug:      "medium",
+			ImageSlug:     "ubuntu-24-04",
 		},
-		{Name: "Dev box", Slug: "dev-box", Status: "stopped", Kind: "persistent", DiskGiB: 10, ZoneSlug: "olas-closet"},
+		{
+			Slug:   "dev-box",
+			Status: "stopped",
+			Kind:   "persistent",
+		},
 	}, nil)
 
 	out := &bytes.Buffer{}
@@ -46,12 +46,16 @@ func TestList_printsVMs(t *testing.T) {
 
 	require.NoError(t, vm.List(context.Background(), rt))
 	s := out.String()
-	assert.Contains(t, s, "SLUG")
-	assert.Contains(t, s, "SPEC")
-	assert.Contains(t, s, "test-vm7")
-	assert.Contains(t, s, "micro · 1 vCPU")
-	assert.Contains(t, s, "Ubuntu 24.04 LTS")
+	assert.Contains(t, s, "NAME")
+	assert.Contains(t, s, "PLAN")
+	assert.Contains(t, s, "IMAGE")
+	assert.NotContains(t, s, "UPTIME")
+	assert.Contains(t, s, "warm-jollof")
+	assert.Contains(t, s, "medium")
+	assert.Contains(t, s, "ubuntu-24-04")
+	assert.Contains(t, s, "running")
 	assert.Contains(t, s, "stopped")
+	assert.Contains(t, s, "dev-box")
 }
 
 func TestList_empty(t *testing.T) {

@@ -11,9 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strconv"
 	"strings"
-	"syscall"
 
 	"golang.org/x/crypto/ssh"
 
@@ -40,35 +38,72 @@ type Options struct {
 	GuestUser    string
 	IdentityFile string
 	Debug        bool
+	Command      []string
+	AllocateTTY  bool
+	Stdin        io.Reader
 }
 
-func Open(ctx context.Context, rt *app.Runtime, vm string, opts Options) error {
+func (o *Options) Interactive() bool {
+	return o == nil || len(o.Command) == 0
+}
+
+func Open(ctx context.Context, rt *app.Runtime, ref string, opts *Options) error {
+	vmRef, err := resolveVMRef(ctx, rt, ref)
+	if err != nil {
+		return err
+	}
+	return connect(ctx, rt, vmRef, opts)
+}
+
+func Exec(ctx context.Context, rt *app.Runtime, ref string, command []string, opts *Options) error {
+	vmRef, err := resolveVMRef(ctx, rt, ref)
+	if err != nil {
+		return err
+	}
+	if opts == nil {
+		opts = &Options{}
+	}
+	opts.Command = command
+	return connect(ctx, rt, vmRef, opts)
+}
+
+func connect(ctx context.Context, rt *app.Runtime, vmRef string, opts *Options) error {
 	var spin *term.Spinner
-	if !opts.Debug {
-		spin = term.StartSpinner(stderr(rt), "Connecting...")
+	if opts == nil || !opts.Debug {
+		if opts != nil && opts.Interactive() {
+			spin = term.StartSpinner(stderr(rt), "Connecting...")
+		}
+	}
+	defer stopSpinner(spin)
+
+	workspace := strings.TrimSpace(rt.Config.Workspace)
+	apiURL := strings.TrimSpace(rt.Config.APIURL)
+	user := guestUser(opts)
+
+	if key, session, ok := sessionCache.get(apiURL, workspace, vmRef, user); ok {
+		rumptylog.Debug("reusing cached ssh certificate", "vm", vmRef, "workspace", workspace)
+		return Dial(ctx, &session, key, opts, spin)
 	}
 
 	key, err := NewKeyPair()
 	if err != nil {
-		stopSpinner(spin)
 		return err
 	}
 	pubLine, err := key.AuthorizedKeyLine()
 	if err != nil {
-		stopSpinner(spin)
 		return err
 	}
 
-	rumptylog.Debug("requesting SSH certificate", "vm", vm, "workspace", rt.Config.Workspace)
-	session, err := rt.API().IssueSSHCert(ctx, rt.Config.Workspace, api.CertRequest{
-		VM:        vm,
-		Username:  strings.TrimSpace(opts.GuestUser),
+	rumptylog.Debug("requesting SSH certificate", "vm", vmRef, "workspace", workspace)
+	session, err := rt.API().IssueSSHCert(ctx, workspace, api.CertRequest{
+		VM:        vmRef,
+		Username:  user,
 		PublicKey: pubLine,
 	})
 	if err != nil {
-		stopSpinner(spin)
 		return err
 	}
+	sessionCache.put(apiURL, workspace, vmRef, user, key, &session)
 	rumptylog.Debug("connecting with ssh", "host", session.EdgeHost, "port", session.EdgePort, "router_user", session.RouterUser)
 	return Dial(ctx, &session, key, opts, spin)
 }
@@ -78,6 +113,13 @@ func stderr(rt *app.Runtime) io.Writer {
 		return rt.Streams.ErrOut
 	}
 	return os.Stderr
+}
+
+func guestUser(opts *Options) string {
+	if opts == nil {
+		return ""
+	}
+	return strings.TrimSpace(opts.GuestUser)
 }
 
 func stopSpinner(spin *term.Spinner) {
@@ -102,7 +144,14 @@ func (k KeyPair) AuthorizedKeyLine() (string, error) {
 	return strings.TrimSpace(string(ssh.MarshalAuthorizedKey(sshPublicKey))), nil
 }
 
-func Dial(ctx context.Context, session *api.CertResponse, key KeyPair, opts Options, spin *term.Spinner) error {
+func Dial(ctx context.Context, session *api.CertResponse, key KeyPair, opts *Options, spin *term.Spinner) error {
+	defer stopSpinner(spin)
+
+	sshBin, err := SSHBinPath()
+	if err != nil {
+		return err
+	}
+
 	dir, err := os.MkdirTemp("", "rumpty-ssh-*")
 	if err != nil {
 		return err
@@ -123,52 +172,30 @@ func Dial(ctx context.Context, session *api.CertResponse, key KeyPair, opts Opti
 		return fmt.Errorf("write temporary certificate: %w", err)
 	}
 
-	proxyCommand := strings.Join([]string{
-		"ssh",
-		"-i", keyPath,
-		"-o", "CertificateFile=" + certPath,
-		"-o", "IdentitiesOnly=yes",
-		"-o", "RequestTTY=no",
-		"-T",
-		"-p", strconv.Itoa(session.EdgePort),
-		session.RouterUser + "@" + session.EdgeHost,
-	}, " ")
+	proxyCommand := buildProxyCommand(sshBin, session, keyPath, certPath, opts != nil && opts.Debug)
+	args := buildSSHArgs(proxyCommand, session, opts)
 
-	args := []string{
-		"-o", "ProxyCommand=" + proxyCommand,
-		"-o", "CheckHostIP=no",
-		"-o", "PubkeyAcceptedAlgorithms=+ssh-rsa",
-		"-o", "HostkeyAlgorithms=+ssh-rsa",
+	cmd := exec.CommandContext(ctx, sshBin, args...)
+	if opts.Interactive() {
+		cmd.Stdin = os.Stdin
+	} else if opts != nil && opts.Stdin != nil {
+		cmd.Stdin = opts.Stdin
 	}
-	if opts.Debug {
-		args = append(args, "-vvv")
-	}
-	if strings.TrimSpace(opts.IdentityFile) != "" {
-		args = append(args,
-			"-i", opts.IdentityFile,
-			"-o", "IdentitiesOnly=yes",
-		)
-	}
-	args = append(args, session.Username+"@"+session.VMSlug)
 
-	cmd := exec.CommandContext(ctx, "ssh", args...)
-	cmd.Stdin = os.Stdin
-	stdout := io.Writer(os.Stdout)
-	if spin != nil {
-		defer spin.Stop()
-		stdout = term.StopSpinnerOnWrite(os.Stdout, spin)
-	}
-	cmd.Stdout = stdout
+	stopSpinner(spin)
+	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
 	if err := cmd.Run(); err != nil {
-		var exitErr *exec.ExitError
-		if errors.As(err, &exitErr) {
-			if status, ok := exitErr.Sys().(syscall.WaitStatus); ok {
-				return &ExitError{Code: status.ExitStatus()}
-			}
-		}
-		return err
+		return wrapRunErr(err)
 	}
 	return nil
+}
+
+func wrapRunErr(err error) error {
+	var exitErr *exec.ExitError
+	if errors.As(err, &exitErr) {
+		return &ExitError{Code: exitErr.ExitCode()}
+	}
+	return err
 }

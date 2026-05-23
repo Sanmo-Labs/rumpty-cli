@@ -34,6 +34,8 @@ func TestNewKeyPair_AuthorizedKeyLine(t *testing.T) {
 
 func TestOpen_issueCertError(t *testing.T) {
 	t.Parallel()
+	t.Cleanup(rumptyssh.ResetCertCacheForTest)
+	rumptyssh.ResetCertCacheForTest()
 
 	ctrl := gomock.NewController(t)
 	mock := mocks.NewMockClientAPI(ctrl)
@@ -46,7 +48,7 @@ func TestOpen_issueCertError(t *testing.T) {
 		APIClient: mock,
 	}
 
-	err := rumptyssh.Open(context.Background(), rt, "my-vm", rumptyssh.Options{})
+	err := rumptyssh.Open(context.Background(), rt, "my-vm", &rumptyssh.Options{})
 	require.Error(t, err)
 	var apiErr *api.Error
 	require.ErrorAs(t, err, &apiErr)
@@ -55,6 +57,8 @@ func TestOpen_issueCertError(t *testing.T) {
 
 func TestOpen_sendsPublicKey(t *testing.T) {
 	t.Parallel()
+	t.Cleanup(rumptyssh.ResetCertCacheForTest)
+	rumptyssh.ResetCertCacheForTest()
 
 	ctrl := gomock.NewController(t)
 	mock := mocks.NewMockClientAPI(ctrl)
@@ -71,7 +75,7 @@ func TestOpen_sendsPublicKey(t *testing.T) {
 		Config:    &config.Config{Token: "tok", Workspace: "acme"},
 		APIClient: mock,
 	}
-	_ = rumptyssh.Open(context.Background(), rt, "my-vm", rumptyssh.Options{GuestUser: "ubuntu"})
+	_ = rumptyssh.Open(context.Background(), rt, "my-vm", &rumptyssh.Options{GuestUser: "ubuntu"})
 }
 
 func TestExitError(t *testing.T) {
