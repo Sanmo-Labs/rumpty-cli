@@ -79,6 +79,7 @@ func NewRoot(rt *app.Runtime) *cobra.Command {
 		newVMsCmd(rt),
 		newSSHCmd(rt),
 		newExecCmd(rt),
+		newCopyCmd(rt),
 	)
 
 	defaultHelp := cmd.HelpFunc()
