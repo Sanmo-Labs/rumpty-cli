@@ -31,6 +31,22 @@ func TestFind_bySlug(t *testing.T) {
 	assert.Equal(t, "vm-uid-7", got.UID)
 }
 
+func TestFind_byName(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	mock := mocks.NewMockClientAPI(ctrl)
+	mock.EXPECT().ListVMs(gomock.Any(), "acme").Return([]api.VM{
+		{UID: "vm-uid-7", Slug: "test-vm7", Name: "Test VM Seven"},
+	}, nil)
+
+	rt := &app.Runtime{
+		Config:    &config.Config{Workspace: "acme"},
+		APIClient: mock,
+	}
+	got, err := vm.Find(context.Background(), rt, "Test VM Seven")
+	require.NoError(t, err)
+	assert.Equal(t, "test-vm7", got.Slug)
+}
+
 func TestFind_notFound(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	mock := mocks.NewMockClientAPI(ctrl)
