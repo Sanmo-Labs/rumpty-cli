@@ -29,6 +29,7 @@ func TestList_printsVMs(t *testing.T) {
 			DisplayStatus: "running",
 			PlanSlug:      "medium",
 			ImageSlug:     "ubuntu-24-04",
+			AppURL:        "https://warm-jollof.app.stg.rumptycloud.com",
 		},
 		{
 			Slug:   "dev-box",
@@ -49,10 +50,12 @@ func TestList_printsVMs(t *testing.T) {
 	assert.Contains(t, s, "NAME")
 	assert.Contains(t, s, "PLAN")
 	assert.Contains(t, s, "IMAGE")
+	assert.Contains(t, s, "APP URL")
 	assert.NotContains(t, s, "UPTIME")
 	assert.Contains(t, s, "warm-jollof")
 	assert.Contains(t, s, "medium")
 	assert.Contains(t, s, "ubuntu-24-04")
+	assert.Contains(t, s, "https://warm-jollof.app.stg.rumptycloud.com")
 	assert.Contains(t, s, "running")
 	assert.Contains(t, s, "stopped")
 	assert.Contains(t, s, "dev-box")
