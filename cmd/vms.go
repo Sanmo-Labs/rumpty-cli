@@ -12,14 +12,14 @@ import (
 
 func newVMsCmd(rt *app.Runtime) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "vms",
+		Use:   "vm",
 		Short: "Manage workspace VMs",
 		Long:  "List and manage virtual machines in the configured Rumpty workspace.",
-		Example: `  rumpty vms ls --ws production-team-019e2b95
-  rumpty vms stop test-vm7 --ws production-team-019e2b95
-  rumpty vms start test-vm7
-  rumpty vms reboot test-vm7
-  rumpty vms delete test-vm`,
+		Example: `  rumpty vm ls --ws production-team-019e2b95
+  rumpty vm stop test-vm7 --ws production-team-019e2b95
+  rumpty vm start test-vm7
+  rumpty vm reboot test-vm7
+  rumpty vm delete test-vm`,
 	}
 
 	cmd.AddCommand(
@@ -37,8 +37,8 @@ func newVMListCmd(rt *app.Runtime) *cobra.Command {
 	return &cobra.Command{
 		Use:   "ls",
 		Short: "List VMs in the workspace",
-		Example: `  rumpty vms ls
-  rumpty vms ls --ws production-team-019e2b95`,
+		Example: `  rumpty vm ls
+  rumpty vm ls --ws production-team-019e2b95`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := rt.Config.ValidateForSSH(); err != nil {
 				return config.NewUsageError("%v", err)

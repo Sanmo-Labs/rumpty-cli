@@ -81,6 +81,7 @@ type VM struct {
 	ImageName     string `json:"image_name,omitempty"`
 	ZoneSlug      string `json:"zone_slug"`
 	DiskGiB       int    `json:"disk_gib"`
+	AppURL        string `json:"app_url,omitempty"`
 }
 
 type Workspace struct {
