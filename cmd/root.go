@@ -77,6 +77,8 @@ func NewRoot(rt *app.Runtime) *cobra.Command {
 		newLogoutCmd(rt),
 		newWorkspacesCmd(rt),
 		newVMsCmd(rt),
+		newExposeCmd(rt),
+		newUnexposeCmd(rt),
 		newSSHCmd(rt),
 		newExecCmd(rt),
 		newCopyCmd(rt),

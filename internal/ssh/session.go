@@ -68,20 +68,19 @@ func Exec(ctx context.Context, rt *app.Runtime, ref string, command []string, op
 }
 
 func connect(ctx context.Context, rt *app.Runtime, vmRef string, opts *Options) error {
-	var spin *term.Spinner
 	if opts == nil || !opts.Debug {
-		if opts != nil && opts.Interactive() {
-			spin = term.StartSpinner(stderr(rt), "Connecting...")
-		}
+		term.Statusf(stderr(rt), "Preparing SSH access for %s", vmRef)
 	}
-	defer stopSpinner(spin)
 
 	key, session, err := obtainSession(ctx, rt, vmRef, opts)
 	if err != nil {
 		return err
 	}
 	rumptylog.Debug("connecting with ssh", "host", session.EdgeHost, "port", session.EdgePort, "router_user", session.RouterUser)
-	return Dial(ctx, &session, key, opts, spin)
+	if opts == nil || !opts.Debug {
+		term.Statusf(stderr(rt), "Opening SSH session as %s", session.Username)
+	}
+	return Dial(ctx, &session, key, opts, nil)
 }
 
 func obtainSession(ctx context.Context, rt *app.Runtime, vmRef string, opts *Options) (KeyPair, api.CertResponse, error) {

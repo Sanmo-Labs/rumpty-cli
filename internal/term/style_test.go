@@ -22,6 +22,11 @@ func TestBold_noEscapeWithNO_COLOR(t *testing.T) {
 	assert.Equal(t, "hello", got)
 }
 
+func TestMuted_noEscapeWhenNotTerminal(t *testing.T) {
+	var buf bytes.Buffer
+	assert.Equal(t, "hello", term.Muted(&buf, "hello"))
+}
+
 func TestLink_noEscapeWhenNotTerminal(t *testing.T) {
 	var buf bytes.Buffer
 	assert.Equal(t, "https://example.com", term.Link(&buf, "https://example.com"))

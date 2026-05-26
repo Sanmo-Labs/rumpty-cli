@@ -1,0 +1,64 @@
+package commands
+
+import (
+	"github.com/spf13/cobra"
+
+	"github.com/Sanmo-Labs/rumpty-cli/internal/app"
+	"github.com/Sanmo-Labs/rumpty-cli/internal/config"
+	"github.com/Sanmo-Labs/rumpty-cli/internal/vm"
+)
+
+func newExposeCmd(rt *app.Runtime) *cobra.Command {
+	var name string
+	var port int
+
+	cmd := &cobra.Command{
+		Use:   "expose <vm>",
+		Short: "Expose a VM service with a public URL",
+		Long: `Expose a service running inside a VM through Rumpty HTTP access.
+
+The service inside the VM must listen on 0.0.0.0:<port>, not only 127.0.0.1.`,
+		Example: `  rumpty expose test-vm8 --ws production-team-019e2b95 --port 18789 --name openclaw
+  rumpty expose api-box --ws production-team-019e2b95 -p 3000`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := rt.Config.ValidateForSSH(); err != nil {
+				return config.NewUsageError("%v", err)
+			}
+			if port == 0 {
+				return config.NewUsageError("--port is required")
+			}
+			if port < 1 || port > 65535 {
+				return config.NewUsageError("--port must be between 1 and 65535")
+			}
+			return vm.Expose(cmd.Context(), rt, args[0], port, name)
+		},
+	}
+
+	cmd.Flags().StringVar(&name, "name", "", "Public app name; defaults to port-<port>")
+	cmd.Flags().IntVarP(&port, "port", "p", 0, "Port inside the VM to expose")
+	return cmd
+}
+
+func newUnexposeCmd(rt *app.Runtime) *cobra.Command {
+	var name string
+
+	cmd := &cobra.Command{
+		Use:     "unexpose <vm>",
+		Short:   "Remove a VM service public URL",
+		Example: `  rumpty unexpose test-vm8 --ws production-team-019e2b95 --name openclaw`,
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := rt.Config.ValidateForSSH(); err != nil {
+				return config.NewUsageError("%v", err)
+			}
+			if name == "" {
+				return config.NewUsageError("--name is required")
+			}
+			return vm.Unexpose(cmd.Context(), rt, args[0], name)
+		},
+	}
+
+	cmd.Flags().StringVar(&name, "name", "", "Public app name to remove")
+	return cmd
+}
