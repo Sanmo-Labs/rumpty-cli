@@ -35,6 +35,21 @@ func (c *Client) ListVMs(ctx context.Context, workspace string) ([]VM, error) {
 	return data, nil
 }
 
+func (c *Client) ListVMApps(ctx context.Context, workspace, vmUID string) ([]VMApp, error) {
+	var data []VMApp
+	if err := c.getWithOptions(ctx, vmPath(vmUID, "apps"), &data, requestOptions{
+		headers: map[string]string{
+			headerWorkspaceSlug: workspace,
+		},
+	}); err != nil {
+		return nil, err
+	}
+	if data == nil {
+		return []VMApp{}, nil
+	}
+	return data, nil
+}
+
 func vmPath(vmUID, action string) string {
 	path := "/v1/vms/" + url.PathEscape(vmUID)
 	if action != "" {
@@ -64,6 +79,19 @@ func (c *Client) RebootVM(ctx context.Context, workspace, vmUID, idempotency str
 func (c *Client) DeleteVM(ctx context.Context, workspace, vmUID, idempotency string) (VMOperationResult, error) {
 	var data VMOperationResult
 	err := c.deleteWithOptions(ctx, vmPath(vmUID, ""), &data, workspaceRequestOptions(workspace, idempotency))
+	return data, err
+}
+
+func (c *Client) ExposeVMApp(ctx context.Context, workspace, vmUID string, req ExposeVMAppRequest, idempotency string) (ExposeVMAppResult, error) {
+	var data ExposeVMAppResult
+	err := c.post(ctx, vmPath(vmUID, "apps"), req, &data, workspaceRequestOptions(workspace, idempotency))
+	return data, err
+}
+
+func (c *Client) UnexposeVMApp(ctx context.Context, workspace, vmUID, app string, idempotency string) (UnexposeVMAppResult, error) {
+	var data UnexposeVMAppResult
+	path := vmPath(vmUID, "apps") + "/" + url.PathEscape(app)
+	err := c.deleteWithOptions(ctx, path, &data, workspaceRequestOptions(workspace, idempotency))
 	return data, err
 }
 

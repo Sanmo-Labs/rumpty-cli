@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/Sanmo-Labs/rumpty-cli/internal/config"
+	"github.com/Sanmo-Labs/rumpty-cli/internal/term"
 )
 
 func CheckErr(err error) {
@@ -12,9 +13,9 @@ func CheckErr(err error) {
 		return
 	}
 	if config.IsUsageError(err) {
-		fmt.Fprintln(os.Stderr, err)
+		_, _ = fmt.Fprintln(os.Stderr, err)
 		os.Exit(2)
 	}
-	fmt.Fprintf(os.Stderr, "rumpty: %v\n", err)
+	term.PrintError(os.Stderr, err)
 	os.Exit(1)
 }

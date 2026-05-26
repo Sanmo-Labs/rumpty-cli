@@ -67,6 +67,44 @@ type VMOperationResult struct {
 	IsCompleted bool   `json:"is_completed,omitempty"`
 }
 
+type ExposeVMAppRequest struct {
+	Name string `json:"name,omitempty"`
+	Port int    `json:"port"`
+}
+
+type VMApp struct {
+	UID       string `json:"uid"`
+	Name      string `json:"name"`
+	Slug      string `json:"slug"`
+	Status    string `json:"status"`
+	Port      int    `json:"port"`
+	Hostname  string `json:"hostname"`
+	URL       string `json:"url"`
+	CreatedAt string `json:"created_at"`
+}
+
+type ExposeVMAppResult struct {
+	OperationID string `json:"operation_id"`
+	VMUID       string `json:"vm_uid"`
+	VMName      string `json:"vm_name"`
+	App         VMApp  `json:"app"`
+	Status      string `json:"status"`
+	EventsURL   string `json:"events_url"`
+	IsReplay    bool   `json:"is_replay"`
+	IsCompleted bool   `json:"is_completed,omitempty"`
+}
+
+type UnexposeVMAppResult struct {
+	OperationID string `json:"operation_id"`
+	VMUID       string `json:"vm_uid"`
+	VMName      string `json:"vm_name"`
+	App         VMApp  `json:"app"`
+	Status      string `json:"status"`
+	EventsURL   string `json:"events_url"`
+	IsReplay    bool   `json:"is_replay"`
+	IsCompleted bool   `json:"is_completed,omitempty"`
+}
+
 type VM struct {
 	UID           string `json:"uid"`
 	Name          string `json:"name"`

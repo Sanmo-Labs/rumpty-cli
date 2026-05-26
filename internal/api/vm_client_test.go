@@ -3,6 +3,7 @@ package api_test
 import (
 	"context"
 	"encoding/json"
+	"io"
 	"net/http"
 	"testing"
 
@@ -47,6 +48,34 @@ func TestClient_ListVMs(t *testing.T) {
 	assert.Equal(t, "Ubuntu 24.04 LTS", got[0].ImageName)
 }
 
+func TestClient_ListVMApps(t *testing.T) {
+	t.Parallel()
+
+	payload, err := json.Marshal([]api.VMApp{
+		{
+			UID: "app-1", Name: "OpenClaw", Slug: "openclaw", Status: "ready",
+			Port: 18790, URL: "https://openclaw.app.stg.rumptycloud.com",
+		},
+	})
+	require.NoError(t, err)
+
+	var workspace string
+	srv := newTestServer(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/v1/vms/vm-uid-7/apps", r.URL.Path)
+		assert.Equal(t, http.MethodGet, r.Method)
+		workspace = r.Header.Get("X-Workspace-Slug")
+		writeJSON(t, w, http.StatusOK, apiEnvelope(true, "ok", "", json.RawMessage(payload)))
+	}))
+
+	client := api.NewClient(srv.URL, "tok")
+	got, err := client.ListVMApps(context.Background(), "production-team", "vm-uid-7")
+	require.NoError(t, err)
+	assert.Equal(t, "production-team", workspace)
+	require.Len(t, got, 1)
+	assert.Equal(t, "openclaw", got[0].Slug)
+	assert.Equal(t, 18790, got[0].Port)
+}
+
 func TestClient_StopVM(t *testing.T) {
 	t.Parallel()
 
@@ -88,6 +117,47 @@ func TestClient_DeleteVM(t *testing.T) {
 	got, err := client.DeleteVM(context.Background(), "acme", "vm-uid-7", "idem-2")
 	require.NoError(t, err)
 	assert.Equal(t, "op-2", got.OperationID)
+}
+
+func TestClient_ExposeVMApp(t *testing.T) {
+	t.Parallel()
+
+	var workspace, idempotency string
+	srv := newTestServer(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/v1/vms/vm-uid-7/apps", r.URL.Path)
+		assert.Equal(t, http.MethodPost, r.Method)
+		workspace = r.Header.Get("X-Workspace-Slug")
+		idempotency = r.Header.Get("X-Idempotency")
+
+		body, err := io.ReadAll(r.Body)
+		assert.NoError(t, err)
+		assert.JSONEq(t, `{"name":"openclaw","port":18789}`, string(body))
+
+		writeJSON(t, w, http.StatusAccepted, apiEnvelope(true, "vm app exposure queued", "", map[string]any{
+			"operation_id": "op-3",
+			"vm_uid":       "vm-uid-7",
+			"vm_name":      "test-vm7",
+			"status":       "queued",
+			"app": map[string]any{
+				"uid":      "app-1",
+				"name":     "openclaw",
+				"slug":     "openclaw",
+				"status":   "pending",
+				"port":     18789,
+				"hostname": "openclaw-abc.app.stg.rumptycloud.com",
+				"url":      "https://openclaw-abc.app.stg.rumptycloud.com",
+			},
+		}))
+	}))
+
+	client := api.NewClient(srv.URL, "tok")
+	got, err := client.ExposeVMApp(context.Background(), "acme", "vm-uid-7", api.ExposeVMAppRequest{Name: "openclaw", Port: 18789}, "idem-3")
+	require.NoError(t, err)
+	assert.Equal(t, "acme", workspace)
+	assert.Equal(t, "idem-3", idempotency)
+	assert.Equal(t, "op-3", got.OperationID)
+	assert.Equal(t, "https://openclaw-abc.app.stg.rumptycloud.com", got.App.URL)
+	assert.Equal(t, 18789, got.App.Port)
 }
 
 func TestClient_ListVMs_empty(t *testing.T) {

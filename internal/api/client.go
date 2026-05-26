@@ -49,7 +49,7 @@ func (c *Client) post(ctx context.Context, path string, body any, out any, opts 
 	rumptylog.Debug("API request", "method", "POST", "path", path)
 	resp, err := req.Post(path)
 	if err != nil {
-		return fmt.Errorf("post %s: %w", path, err)
+		return TransportError(err)
 	}
 	rumptylog.Debug("API response", "method", "POST", "path", path, "status", resp.StatusCode())
 	return decodeEnvelope(resp, out)
@@ -63,7 +63,7 @@ func (c *Client) deleteWithOptions(ctx context.Context, path string, out any, op
 	rumptylog.Debug("API request", "method", "DELETE", "path", path)
 	resp, err := req.Delete(path)
 	if err != nil {
-		return fmt.Errorf("delete %s: %w", path, err)
+		return TransportError(err)
 	}
 	rumptylog.Debug("API response", "method", "DELETE", "path", path, "status", resp.StatusCode())
 	return decodeEnvelope(resp, out)
@@ -81,7 +81,7 @@ func (c *Client) getWithOptions(ctx context.Context, path string, out any, opts 
 	rumptylog.Debug("API request", "method", "GET", "path", path)
 	resp, err := req.Get(path)
 	if err != nil {
-		return fmt.Errorf("get %s: %w", path, err)
+		return TransportError(err)
 	}
 	rumptylog.Debug("API response", "method", "GET", "path", path, "status", resp.StatusCode())
 	return decodeEnvelope(resp, out)
