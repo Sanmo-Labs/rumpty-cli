@@ -73,14 +73,15 @@ type ExposeVMAppRequest struct {
 }
 
 type VMApp struct {
-	UID       string `json:"uid"`
-	Name      string `json:"name"`
-	Slug      string `json:"slug"`
-	Status    string `json:"status"`
-	Port      int    `json:"port"`
-	Hostname  string `json:"hostname"`
-	URL       string `json:"url"`
-	CreatedAt string `json:"created_at"`
+	UID         string `json:"uid"`
+	Name        string `json:"name"`
+	Slug        string `json:"slug"`
+	Status      string `json:"status"`
+	Port        int    `json:"port"`
+	Hostname    string `json:"hostname"`
+	URL         string `json:"url"`
+	LastFailure string `json:"last_failure,omitempty"`
+	CreatedAt   string `json:"created_at"`
 }
 
 type ExposeVMAppResult struct {

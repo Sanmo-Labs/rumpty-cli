@@ -12,9 +12,10 @@ import (
 
 func newVMsCmd(rt *app.Runtime) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "vm",
-		Short: "Manage workspace VMs",
-		Long:  "List and manage virtual machines in the configured Rumpty workspace.",
+		Use:     "vm",
+		Aliases: []string{"vms"},
+		Short:   "Manage workspace VMs",
+		Long:    "List and manage virtual machines in the configured Rumpty workspace.",
 		Example: `  rumpty vm ls --ws production-team-019e2b95
   rumpty vm stop test-vm7 --ws production-team-019e2b95
   rumpty vm start test-vm7

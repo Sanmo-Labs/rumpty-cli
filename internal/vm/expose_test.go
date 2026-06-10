@@ -53,7 +53,8 @@ func TestExpose_waitsAndPrintsURL(t *testing.T) {
 	require.NoError(t, vm.Expose(context.Background(), rt, "test-vm7", 18789, "openclaw"))
 	assert.Contains(t, out.String(), "Exposed openclaw on test-vm7")
 	assert.Contains(t, out.String(), "URL: https://openclaw-abc.app.stg.rumptycloud.com")
-	assert.Contains(t, out.String(), "Port: 18789")
+	assert.Contains(t, out.String(), "View: rumpty vm expose ls test-vm7 --ws acme")
+	assert.Contains(t, out.String(), "Remove: rumpty unexpose test-vm7 --ws acme --name openclaw")
 }
 
 func TestExpose_rejectsInvalidPort(t *testing.T) {
