@@ -69,7 +69,7 @@ func Exec(ctx context.Context, rt *app.Runtime, ref string, command []string, op
 
 func connect(ctx context.Context, rt *app.Runtime, vmRef string, opts *Options) error {
 	if opts == nil || !opts.Debug {
-		term.Statusf(stderr(rt), "Preparing SSH access for %s", vmRef)
+		term.Statusf(stderr(rt), "%s", prepareStatus(vmRef, opts))
 	}
 
 	key, session, err := obtainSession(ctx, rt, vmRef, opts)
@@ -78,9 +78,23 @@ func connect(ctx context.Context, rt *app.Runtime, vmRef string, opts *Options) 
 	}
 	rumptylog.Debug("connecting with ssh", "host", session.EdgeHost, "port", session.EdgePort, "router_user", session.RouterUser)
 	if opts == nil || !opts.Debug {
-		term.Statusf(stderr(rt), "Opening SSH session as %s", session.Username)
+		term.Statusf(stderr(rt), "%s", openStatus(session.Username, opts))
 	}
 	return Dial(ctx, &session, key, opts, nil)
+}
+
+func prepareStatus(vmRef string, opts *Options) string {
+	if opts != nil && len(opts.Command) > 0 {
+		return fmt.Sprintf("Preparing remote command for %s", vmRef)
+	}
+	return fmt.Sprintf("Preparing SSH access for %s", vmRef)
+}
+
+func openStatus(username string, opts *Options) string {
+	if opts != nil && len(opts.Command) > 0 {
+		return fmt.Sprintf("Running remote command as %s", username)
+	}
+	return fmt.Sprintf("Opening SSH session as %s", username)
 }
 
 func obtainSession(ctx context.Context, rt *app.Runtime, vmRef string, opts *Options) (KeyPair, api.CertResponse, error) {

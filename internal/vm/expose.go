@@ -55,7 +55,8 @@ func Expose(ctx context.Context, rt *app.Runtime, ref string, port int, name str
 
 	fmt.Fprintf(rt.Streams.Out, "Exposed %s on %s\n", appDisplayName(&result.App), target.Slug)
 	fmt.Fprintf(rt.Streams.Out, "URL: %s\n", result.App.URL)
-	fmt.Fprintf(rt.Streams.Out, "Port: %d\n", result.App.Port)
+	fmt.Fprintf(rt.Streams.Out, "View: rumpty vm expose ls %s --ws %s\n", target.Slug, workspace)
+	fmt.Fprintf(rt.Streams.Out, "Remove: rumpty unexpose %s --ws %s --name %s\n", target.Slug, workspace, appDisplayName(&result.App))
 	return nil
 }
 

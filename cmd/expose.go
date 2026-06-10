@@ -20,7 +20,15 @@ func newExposeCmd(rt *app.Runtime) *cobra.Command {
 The service inside the VM must listen on 0.0.0.0:<port>, not only 127.0.0.1.`,
 		Example: `  rumpty expose test-vm8 --ws production-team-019e2b95 --port 18789 --name openclaw
   rumpty expose api-box --ws production-team-019e2b95 -p 3000`,
-		Args: cobra.ExactArgs(1),
+		Args: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 1 {
+				return nil
+			}
+			if len(args) > 1 {
+				return config.NewUsageError("unexpected argument %q\nTo list exposed URLs, run: rumpty vm expose ls %s --ws <workspace>", args[1], args[0])
+			}
+			return config.NewUsageError("missing VM name")
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := rt.Config.ValidateForSSH(); err != nil {
 				return config.NewUsageError("%v", err)
@@ -47,7 +55,15 @@ func newUnexposeCmd(rt *app.Runtime) *cobra.Command {
 		Use:     "unexpose <vm>",
 		Short:   "Remove a VM service public URL",
 		Example: `  rumpty unexpose test-vm8 --ws production-team-019e2b95 --name openclaw`,
-		Args:    cobra.ExactArgs(1),
+		Args: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 1 {
+				return nil
+			}
+			if len(args) > 1 {
+				return config.NewUsageError("unexpected argument %q", args[1])
+			}
+			return config.NewUsageError("missing VM name")
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := rt.Config.ValidateForSSH(); err != nil {
 				return config.NewUsageError("%v", err)

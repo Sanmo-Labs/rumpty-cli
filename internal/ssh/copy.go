@@ -39,11 +39,9 @@ func Copy(ctx context.Context, rt *app.Runtime, src, dest string, opts *Options,
 		return err
 	}
 
-	var spin *term.Spinner
 	if opts == nil || !opts.Debug {
-		spin = term.StartSpinner(stderr(rt), "Connecting...")
+		term.Statusf(stderr(rt), "Preparing file transfer for %s", vmRef)
 	}
-	defer stopSpinner(spin)
 
 	key, session, err := obtainSession(ctx, rt, vmRef, opts)
 	if err != nil {
@@ -63,7 +61,9 @@ func Copy(ctx context.Context, rt *app.Runtime, src, dest string, opts *Options,
 
 	debug := opts != nil && opts.Debug
 	proxyCommand := buildProxyCommand(sshBin, &session, keyPath, certPath, debug)
-	stopSpinner(spin)
+	if !debug {
+		term.Statusf(stderr(rt), "Transferring files as %s", session.Username)
+	}
 
 	return copyWithFallback(ctx, rt, &copySession{
 		sshBin:       sshBin,
