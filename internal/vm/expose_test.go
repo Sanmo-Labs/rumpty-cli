@@ -27,8 +27,9 @@ func TestExpose_waitsAndPrintsURL(t *testing.T) {
 	gomock.InOrder(
 		mock.EXPECT().ListVMs(gomock.Any(), "acme").Return([]api.VM{target}, nil),
 		mock.EXPECT().ExposeVMApp(gomock.Any(), "acme", "vm-uid-7", api.ExposeVMAppRequest{
-			Name: "openclaw",
-			Port: 18789,
+			Name:     "openclaw",
+			Port:     18789,
+			Protocol: "http",
 		}, gomock.Any()).Return(api.ExposeVMAppResult{
 			OperationID: "op-3",
 			VMUID:       "vm-uid-7",
@@ -50,7 +51,7 @@ func TestExpose_waitsAndPrintsURL(t *testing.T) {
 		APIClient: mock,
 	}
 
-	require.NoError(t, vm.Expose(context.Background(), rt, "test-vm7", 18789, "openclaw"))
+	require.NoError(t, vm.Expose(context.Background(), rt, "test-vm7", 18789, "openclaw", "http"))
 	assert.Contains(t, out.String(), "Exposed openclaw on test-vm7")
 	assert.Contains(t, out.String(), "URL: https://openclaw-abc.app.stg.rumptycloud.com")
 	assert.Contains(t, out.String(), "View: rumpty vm expose ls test-vm7 --ws acme")
@@ -59,5 +60,5 @@ func TestExpose_waitsAndPrintsURL(t *testing.T) {
 
 func TestExpose_rejectsInvalidPort(t *testing.T) {
 	rt := &app.Runtime{Config: &config.Config{Workspace: "acme"}}
-	require.ErrorContains(t, vm.Expose(context.Background(), rt, "test-vm7", 0, ""), "port must be between")
+	require.ErrorContains(t, vm.Expose(context.Background(), rt, "test-vm7", 0, "", ""), "port must be between")
 }

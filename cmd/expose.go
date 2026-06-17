@@ -11,15 +11,19 @@ import (
 func newExposeCmd(rt *app.Runtime) *cobra.Command {
 	var name string
 	var port int
+	var protocol string
 
 	cmd := &cobra.Command{
 		Use:   "expose <vm>",
 		Short: "Expose a VM service with a public URL",
 		Long: `Expose a service running inside a VM through Rumpty HTTP access.
 
-The service inside the VM must listen on 0.0.0.0:<port>, not only 127.0.0.1.`,
+The service inside the VM must listen on 0.0.0.0:<port>, not only 127.0.0.1.
+
+Use --protocol grpc for gRPC services.`,
 		Example: `  rumpty expose test-vm8 --ws production-team-019e2b95 --port 18789 --name openclaw
-  rumpty expose api-box --ws production-team-019e2b95 -p 3000`,
+  rumpty expose api-box --ws production-team-019e2b95 -p 3000
+  rumpty expose api-box --ws production-team-019e2b95 -p 50051 --protocol grpc`,
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 1 {
 				return nil
@@ -39,12 +43,19 @@ The service inside the VM must listen on 0.0.0.0:<port>, not only 127.0.0.1.`,
 			if port < 1 || port > 65535 {
 				return config.NewUsageError("--port must be between 1 and 65535")
 			}
-			return vm.Expose(cmd.Context(), rt, args[0], port, name)
+			switch protocol {
+			case "", "http", "grpc":
+				// valid
+			default:
+				return config.NewUsageError("--protocol must be http or grpc")
+			}
+			return vm.Expose(cmd.Context(), rt, args[0], port, name, protocol)
 		},
 	}
 
 	cmd.Flags().StringVar(&name, "name", "", "Public app name; defaults to port-<port>")
 	cmd.Flags().IntVarP(&port, "port", "p", 0, "Port inside the VM to expose")
+	cmd.Flags().StringVar(&protocol, "protocol", "", `Application protocol: http (default) or grpc`)
 	return cmd
 }
 

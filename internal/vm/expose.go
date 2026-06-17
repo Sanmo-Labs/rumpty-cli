@@ -16,9 +16,12 @@ const (
 	exposePollTimeout  = 2 * time.Minute
 )
 
-func Expose(ctx context.Context, rt *app.Runtime, ref string, port int, name string) error {
+func Expose(ctx context.Context, rt *app.Runtime, ref string, port int, name string, protocol string) error {
 	if port < 1 || port > 65535 {
 		return fmt.Errorf("port must be between 1 and 65535")
+	}
+	if protocol == "" {
+		protocol = "http"
 	}
 
 	term.Statusf(out(rt), "Resolving VM %s", ref)
@@ -32,10 +35,11 @@ func Expose(ctx context.Context, rt *app.Runtime, ref string, port int, name str
 	if appName == "" {
 		appName = fmt.Sprintf("port-%d", port)
 	}
-	term.Statusf(out(rt), "Requesting public route for %s:%d", target.Slug, port)
+	term.Statusf(out(rt), "Requesting public route for %s:%d (%s)", target.Slug, port, protocol)
 	result, err := rt.API().ExposeVMApp(ctx, workspace, target.UID, api.ExposeVMAppRequest{
-		Name: strings.TrimSpace(name),
-		Port: port,
+		Name:     strings.TrimSpace(name),
+		Port:     port,
+		Protocol: protocol,
 	}, api.NewIdempotencyKey())
 	if err != nil {
 		return err

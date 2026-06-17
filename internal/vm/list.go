@@ -21,13 +21,14 @@ func List(ctx context.Context, rt *app.Runtime) error {
 	}
 
 	tw := tabwriter.NewWriter(rt.Streams.Out, 0, 0, 2, ' ', 0)
-	fmt.Fprintln(tw, "NAME\tPLAN\tIMAGE\tSTATUS\tAPP URL")
+	fmt.Fprintln(tw, "NAME\tPLAN\tIMAGE\tSTATUS\tPORT\tAPP URL")
 	for i := range vms {
-		fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%s\n",
+		fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%s\t%s\n",
 			vms[i].Slug,
 			formatPlan(&vms[i]),
 			formatImage(&vms[i]),
 			displayStatus(&vms[i]),
+			formatAppPort(&vms[i]),
 			formatAppURL(&vms[i]),
 		)
 	}
@@ -56,6 +57,14 @@ func displayStatus(v *api.VM) string {
 		return s
 	}
 	return strings.TrimSpace(v.Status)
+}
+
+func formatAppPort(v *api.VM) string {
+	ports := []string{"22", "8080"}
+	if v.AppPort > 0 && v.AppPort != 8080 && v.AppPort != 22 {
+		ports = append(ports, fmt.Sprintf("%d", v.AppPort))
+	}
+	return strings.Join(ports, ", ")
 }
 
 func formatAppURL(v *api.VM) string {
