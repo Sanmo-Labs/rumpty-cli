@@ -68,8 +68,9 @@ type VMOperationResult struct {
 }
 
 type ExposeVMAppRequest struct {
-	Name string `json:"name,omitempty"`
-	Port int    `json:"port"`
+	Name     string `json:"name,omitempty"`
+	Port     int    `json:"port"`
+	Protocol string `json:"protocol,omitempty"` // "http" (default) or "grpc"
 }
 
 type VMApp struct {
@@ -78,6 +79,7 @@ type VMApp struct {
 	Slug        string `json:"slug"`
 	Status      string `json:"status"`
 	Port        int    `json:"port"`
+	Protocol    string `json:"protocol"`
 	Hostname    string `json:"hostname"`
 	URL         string `json:"url"`
 	LastFailure string `json:"last_failure,omitempty"`
@@ -121,6 +123,7 @@ type VM struct {
 	ZoneSlug      string `json:"zone_slug"`
 	DiskGiB       int    `json:"disk_gib"`
 	AppURL        string `json:"app_url,omitempty"`
+	AppPort       int    `json:"app_port,omitempty"`
 }
 
 type Workspace struct {

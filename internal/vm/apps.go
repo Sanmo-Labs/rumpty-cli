@@ -29,11 +29,12 @@ func ListApps(ctx context.Context, rt *app.Runtime, ref string) error {
 	}
 
 	tw := tabwriter.NewWriter(rt.Streams.Out, 0, 0, 2, ' ', 0)
-	fmt.Fprintln(tw, "NAME\tPORT\tSTATUS\tURL")
+	fmt.Fprintln(tw, "NAME\tPORT\tPROTOCOL\tSTATUS\tURL")
 	for i := range apps {
-		fmt.Fprintf(tw, "%s\t%d\t%s\t%s\n",
+		fmt.Fprintf(tw, "%s\t%d\t%s\t%s\t%s\n",
 			appName(&apps[i]),
 			apps[i].Port,
+			appProtocol(&apps[i]),
 			appStatus(&apps[i]),
 			appURL(&apps[i]),
 		)
@@ -56,6 +57,13 @@ func appStatus(app *api.VMApp) string {
 		return s
 	}
 	return "—"
+}
+
+func appProtocol(app *api.VMApp) string {
+	if s := strings.TrimSpace(app.Protocol); s != "" {
+		return strings.ToUpper(s)
+	}
+	return "HTTP"
 }
 
 func appURL(app *api.VMApp) string {
