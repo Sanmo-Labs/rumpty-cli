@@ -61,10 +61,11 @@ func newVMExposeCmd(rt *app.Runtime) *cobra.Command {
 
 func newVMExposeListCmd(rt *app.Runtime) *cobra.Command {
 	return &cobra.Command{
-		Use:     "ls <vm>",
-		Short:   "List exposed URLs for a VM",
-		Example: `  rumpty vm expose ls test-vm8 --ws production-team-019e2b95`,
-		Args:    cobra.ExactArgs(1),
+		Use:               "ls <vm>",
+		Short:             "List exposed URLs for a VM",
+		Example:           `  rumpty vm expose ls test-vm8 --ws production-team-019e2b95`,
+		Args:              cobra.ExactArgs(1),
+		ValidArgsFunction: completeVMNames(rt),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := rt.Config.ValidateForSSH(); err != nil {
 				return config.NewUsageError("%v", err)
@@ -91,9 +92,10 @@ func newVMListCmd(rt *app.Runtime) *cobra.Command {
 
 func newVMLifecycleCmd(rt *app.Runtime, use, short string, run func(context.Context, *app.Runtime, string) error) *cobra.Command {
 	return &cobra.Command{
-		Use:   use + " <vm>",
-		Short: short,
-		Args:  cobra.ExactArgs(1),
+		Use:               use + " <vm>",
+		Short:             short,
+		Args:              cobra.ExactArgs(1),
+		ValidArgsFunction: completeVMNames(rt),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := rt.Config.ValidateForSSH(); err != nil {
 				return config.NewUsageError("%v", err)

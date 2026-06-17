@@ -33,6 +33,7 @@ Use --protocol grpc for gRPC services.`,
 			}
 			return config.NewUsageError("missing VM name")
 		},
+		ValidArgsFunction: completeVMNames(rt),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := rt.Config.ValidateForSSH(); err != nil {
 				return config.NewUsageError("%v", err)
@@ -75,6 +76,7 @@ func newUnexposeCmd(rt *app.Runtime) *cobra.Command {
 			}
 			return config.NewUsageError("missing VM name")
 		},
+		ValidArgsFunction: completeVMNames(rt),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := rt.Config.ValidateForSSH(); err != nil {
 				return config.NewUsageError("%v", err)

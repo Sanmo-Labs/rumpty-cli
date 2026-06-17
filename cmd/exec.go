@@ -27,6 +27,7 @@ Requires rumpty login, or $RUMPTY_API_KEY and a workspace ($RUMPTY_WORKSPACE or 
   rumpty exec my-vm --ws acme -- bash -lc 'cd /app && git pull'
   rumpty exec my-vm --ws acme -t -- sudo systemctl reload nginx`,
 		DisableFlagsInUseLine: true,
+		ValidArgsFunction:     completeVMNames(rt),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := rt.Config.ValidateForSSH(); err != nil {
 				return config.NewUsageError("%v", err)

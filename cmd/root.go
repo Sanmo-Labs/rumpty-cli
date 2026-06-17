@@ -63,6 +63,10 @@ func NewRoot(rt *app.Runtime) *cobra.Command {
 		"Enable debug logging (same as --log-level=debug)",
 	)
 
+	wsCompletion := completeWorkspaceSlugs(rt)
+	_ = cmd.RegisterFlagCompletionFunc("ws", wsCompletion)
+	_ = cmd.RegisterFlagCompletionFunc("workspace", wsCompletion)
+
 	cobra.OnInitialize(func() {
 		rt.Config.Resolve()
 		if err := rumptylog.Configure(rt.Config.LogLevelValue(), rt.Streams.ErrOut); err != nil {

@@ -21,7 +21,8 @@ func newSSHCmd(rt *app.Runtime) *cobra.Command {
 Requires rumpty login, or $RUMPTY_API_KEY and a workspace ($RUMPTY_WORKSPACE or --ws).`,
 		Example: `  rumpty login
   rumpty ssh my-vm --ws acme-dev`,
-		Args: cobra.ExactArgs(1),
+		Args:              cobra.ExactArgs(1),
+		ValidArgsFunction: completeVMNames(rt),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := rt.Config.ValidateForSSH(); err != nil {
 				return config.NewUsageError("%v", err)
