@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"strings"
 	"testing"
@@ -30,6 +31,16 @@ func testRuntime(t *testing.T, apiClient api.ClientAPI, cfg config.Config) (*app
 		APIClient: apiClient,
 		Browser:   term.NoopBrowser{},
 	}, errOut
+}
+
+type recordingBrowser struct {
+	opened []string
+	err    error
+}
+
+func (b *recordingBrowser) Open(url string) error {
+	b.opened = append(b.opened, url)
+	return b.err
 }
 
 func TestLogin_apiKey(t *testing.T) {
@@ -105,12 +116,15 @@ func TestLogin_device_authorization(t *testing.T) {
 	}, nil)
 
 	rt, errOut := testRuntime(t, mock, config.Config{APIURL: "https://api.example"})
+	browser := &recordingBrowser{}
+	rt.Browser = browser
 	err := auth.Login(context.Background(), rt, "", auth.LoginOptions{})
 	require.NoError(t, err)
 
 	out := errOut.String()
 	assert.Contains(t, out, "WXYZ-9999")
 	assert.Contains(t, out, "Logged in as bob")
+	assert.Equal(t, []string{"https://app.example/device?user_code=WXYZ-9999"}, browser.opened)
 
 	creds, err := credentials.Load()
 	require.NoError(t, err)
@@ -144,6 +158,61 @@ func TestLogin_device_completesWithoutEnter(t *testing.T) {
 	err := auth.Login(context.Background(), rt, "", auth.LoginOptions{})
 	require.NoError(t, err)
 	assert.Contains(t, errOut.String(), "Logged in as bob")
+}
+
+func TestLogin_device_noBrowserDoesNotOpen(t *testing.T) {
+	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
+	ctrl := gomock.NewController(t)
+
+	mock := mocks.NewMockClientAPI(ctrl)
+	mock.EXPECT().StartDevice(gomock.Any()).Return(api.DeviceAuthStartResponse{
+		DeviceCode:              "dc-1",
+		UserCode:                "WXYZ-9999",
+		VerificationURI:         "https://app.example/device",
+		VerificationURIComplete: "https://app.example/device?user_code=WXYZ-9999",
+		ExpiresIn:               60,
+		Interval:                1,
+	}, nil)
+	mock.EXPECT().PollDeviceToken(gomock.Any(), "dc-1").Return(api.DeviceAuthPollResponse{
+		Token: "jwt",
+		User:  api.User{Username: "bob"},
+	}, nil)
+
+	rt, errOut := testRuntime(t, mock, config.Config{APIURL: "https://api.example"})
+	browser := &recordingBrowser{}
+	rt.Browser = browser
+
+	err := auth.Login(context.Background(), rt, "", auth.LoginOptions{NoBrowser: true})
+	require.NoError(t, err)
+	assert.Empty(t, browser.opened)
+	assert.Contains(t, errOut.String(), "Complete sign-in in your browser using the URL above.")
+}
+
+func TestLogin_device_browserOpenFailureKeepsURLFlow(t *testing.T) {
+	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
+	ctrl := gomock.NewController(t)
+
+	mock := mocks.NewMockClientAPI(ctrl)
+	mock.EXPECT().StartDevice(gomock.Any()).Return(api.DeviceAuthStartResponse{
+		DeviceCode:              "dc-1",
+		UserCode:                "WXYZ-9999",
+		VerificationURI:         "https://app.example/device",
+		VerificationURIComplete: "https://app.example/device?user_code=WXYZ-9999",
+		ExpiresIn:               60,
+		Interval:                1,
+	}, nil)
+	mock.EXPECT().PollDeviceToken(gomock.Any(), "dc-1").Return(api.DeviceAuthPollResponse{
+		Token: "jwt",
+		User:  api.User{Username: "bob"},
+	}, nil)
+
+	rt, errOut := testRuntime(t, mock, config.Config{APIURL: "https://api.example"})
+	rt.Browser = &recordingBrowser{err: fmt.Errorf("not available")}
+
+	err := auth.Login(context.Background(), rt, "", auth.LoginOptions{})
+	require.NoError(t, err)
+	assert.Contains(t, errOut.String(), "Could not open the browser.")
+	assert.Contains(t, errOut.String(), "Complete sign-in in your browser using the URL above.")
 }
 
 func TestLogin_device_unexpectedStatus(t *testing.T) {

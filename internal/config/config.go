@@ -17,7 +17,7 @@ const (
 )
 
 var (
-	DefaultAPIURL = "http://localhost:8889"
+	DefaultAPIURL = "https://api.rumptycloud.com"
 )
 
 type Config struct {

@@ -1,13 +1,10 @@
 package auth
 
 import (
-	"bufio"
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/Sanmo-Labs/rumpty-cli/internal/api"
@@ -74,26 +71,15 @@ func loginDevice(ctx context.Context, rt *app.Runtime, noBrowser bool) error {
 	fmt.Fprintln(rt.Streams.ErrOut, term.Bold(rt.Streams.ErrOut, "Open this URL in your browser:"))
 	fmt.Fprintf(rt.Streams.ErrOut, "  %s\n\n", term.Link(rt.Streams.ErrOut, openURL))
 
-	openBrowser := make(chan struct{}, 1)
 	if !noBrowser && openURL != "" {
-		fmt.Fprintf(rt.Streams.ErrOut, "Press Enter to open the browser, or sign in using the URL above: ")
-		go waitForEnter(rt.Streams.In, openBrowser)
+		if err := rt.OpenBrowser(openURL); err != nil {
+			fmt.Fprintf(rt.Streams.ErrOut, "Could not open the browser. %v\n", err)
+			fmt.Fprintln(rt.Streams.ErrOut, "Complete sign-in in your browser using the URL above.")
+		}
 	} else {
 		fmt.Fprintln(rt.Streams.ErrOut, "Complete sign-in in your browser using the URL above.")
 	}
 	fmt.Fprintln(rt.Streams.ErrOut, "Waiting for authorization...")
-
-	var openOnce sync.Once
-	tryOpenBrowser := func() {
-		openOnce.Do(func() {
-			if openURL == "" || noBrowser {
-				return
-			}
-			if err := rt.OpenBrowser(openURL); err != nil {
-				fmt.Fprintf(rt.Streams.ErrOut, "Could not open the browser. %v\n", err)
-			}
-		})
-	}
 
 	for time.Now().Before(deadline) {
 		rumptylog.Debug("polling device authorization")
@@ -117,24 +103,13 @@ func loginDevice(ctx context.Context, rt *app.Runtime, noBrowser bool) error {
 		}
 		timer := time.NewTimer(time.Duration(sleep) * time.Second)
 		select {
-		case <-openBrowser:
-			tryOpenBrowser()
+		case <-ctx.Done():
 			timer.Stop()
+			return ctx.Err()
 		case <-timer.C:
 		}
 	}
 	return errors.New(errLoginTimedOut)
-}
-
-func waitForEnter(in io.Reader, openBrowser chan<- struct{}) {
-	if in == nil {
-		return
-	}
-	_, _ = bufio.NewReader(in).ReadString('\n')
-	select {
-	case openBrowser <- struct{}{}:
-	default:
-	}
 }
 
 func AlreadyLoggedIn(ctx context.Context, rt *app.Runtime) (bool, error) {
