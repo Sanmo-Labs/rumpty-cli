@@ -191,12 +191,46 @@ func Dial(ctx context.Context, session *api.CertResponse, key KeyPair, opts *Opt
 
 	stopSpinner(spin)
 	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	var errTail tailBuffer
+	cmd.Stderr = io.MultiWriter(os.Stderr, &errTail)
 
 	if err := cmd.Run(); err != nil {
+		printHostKeyMismatchHint(errTail.String(), session.VMSlug)
 		return wrapRunErr(err)
 	}
 	return nil
+}
+
+type tailBuffer struct {
+	buf []byte
+}
+
+const tailBufferMax = 8 * 1024
+
+func (t *tailBuffer) Write(p []byte) (int, error) {
+	t.buf = append(t.buf, p...)
+	if len(t.buf) > tailBufferMax {
+		t.buf = t.buf[len(t.buf)-tailBufferMax:]
+	}
+	return len(p), nil
+}
+
+func (t *tailBuffer) String() string { return string(t.buf) }
+
+func printHostKeyMismatchHint(sshStderr, vmSlug string) {
+	if !strings.Contains(sshStderr, "Host key verification failed") &&
+		!strings.Contains(sshStderr, "REMOTE HOST IDENTIFICATION HAS CHANGED") {
+		return
+	}
+	path, err := knownHostsFile()
+	if err != nil {
+		return
+	}
+	fmt.Fprintf(os.Stderr,
+		"\nThe saved host key for %q no longer matches the VM.\n"+
+			"If this VM was rebuilt or recreated, that is expected. Remove the stale entry and retry:\n\n"+
+			"  ssh-keygen -R %s -f %s\n\n",
+		vmSlug, vmSlug, path)
 }
 
 func wrapRunErr(err error) error {
