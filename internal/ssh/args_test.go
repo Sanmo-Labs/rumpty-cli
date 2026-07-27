@@ -39,6 +39,7 @@ func TestBuildSSHArgs_interactive(t *testing.T) {
 	assert.Contains(t, joined, "StrictHostKeyChecking=accept-new")
 	assert.Contains(t, joined, "UserKnownHostsFile=")
 	assert.Contains(t, joined, "LogLevel=ERROR")
+	assert.NotContains(t, args, "-q")
 	assert.NotContains(t, joined, "BatchMode=yes")
 	assert.Equal(t, "ubuntu@my-vm", args[len(args)-1])
 }

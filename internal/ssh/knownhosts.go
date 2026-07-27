@@ -36,7 +36,6 @@ func quietSSHOptions(debug bool) []string {
 		return nil
 	}
 	return []string{
-		"-q",
 		"-o", "LogLevel=ERROR",
 	}
 }
