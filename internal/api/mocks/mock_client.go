@@ -41,6 +41,36 @@ func (m *MockClientAPI) EXPECT() *MockClientAPIMockRecorder {
 	return m.recorder
 }
 
+// CreateAssetAccessKey mocks base method.
+func (m *MockClientAPI) CreateAssetAccessKey(ctx context.Context, workspace, bucketUID string, req api.CreateAssetAccessKeyRequest) (api.CreateAssetAccessKeyResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateAssetAccessKey", ctx, workspace, bucketUID, req)
+	ret0, _ := ret[0].(api.CreateAssetAccessKeyResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateAssetAccessKey indicates an expected call of CreateAssetAccessKey.
+func (mr *MockClientAPIMockRecorder) CreateAssetAccessKey(ctx, workspace, bucketUID, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAssetAccessKey", reflect.TypeOf((*MockClientAPI)(nil).CreateAssetAccessKey), ctx, workspace, bucketUID, req)
+}
+
+// CreateAssetBucket mocks base method.
+func (m *MockClientAPI) CreateAssetBucket(ctx context.Context, workspace string, req api.CreateAssetBucketRequest, idempotency string) (api.AssetBucketOperationResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateAssetBucket", ctx, workspace, req, idempotency)
+	ret0, _ := ret[0].(api.AssetBucketOperationResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateAssetBucket indicates an expected call of CreateAssetBucket.
+func (mr *MockClientAPIMockRecorder) CreateAssetBucket(ctx, workspace, req, idempotency any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAssetBucket", reflect.TypeOf((*MockClientAPI)(nil).CreateAssetBucket), ctx, workspace, req, idempotency)
+}
+
 // DeleteVM mocks base method.
 func (m *MockClientAPI) DeleteVM(ctx context.Context, workspace, vmUID, idempotency string) (api.VMOperationResult, error) {
 	m.ctrl.T.Helper()
@@ -69,21 +99,6 @@ func (m *MockClientAPI) ExposeVMApp(ctx context.Context, workspace, vmUID string
 func (mr *MockClientAPIMockRecorder) ExposeVMApp(ctx, workspace, vmUID, req, idempotency any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExposeVMApp", reflect.TypeOf((*MockClientAPI)(nil).ExposeVMApp), ctx, workspace, vmUID, req, idempotency)
-}
-
-// UnexposeVMApp mocks base method.
-func (m *MockClientAPI) UnexposeVMApp(ctx context.Context, workspace, vmUID, app string, idempotency string) (api.UnexposeVMAppResult, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UnexposeVMApp", ctx, workspace, vmUID, app, idempotency)
-	ret0, _ := ret[0].(api.UnexposeVMAppResult)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UnexposeVMApp indicates an expected call of UnexposeVMApp.
-func (mr *MockClientAPIMockRecorder) UnexposeVMApp(ctx, workspace, vmUID, app, idempotency any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnexposeVMApp", reflect.TypeOf((*MockClientAPI)(nil).UnexposeVMApp), ctx, workspace, vmUID, app, idempotency)
 }
 
 // GetOperation mocks base method.
@@ -116,19 +131,19 @@ func (mr *MockClientAPIMockRecorder) IssueSSHCert(ctx, workspace, req any) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IssueSSHCert", reflect.TypeOf((*MockClientAPI)(nil).IssueSSHCert), ctx, workspace, req)
 }
 
-// ListVMs mocks base method.
-func (m *MockClientAPI) ListVMs(ctx context.Context, workspace string) ([]api.VM, error) {
+// ListAssetBuckets mocks base method.
+func (m *MockClientAPI) ListAssetBuckets(ctx context.Context, workspace string) ([]api.AssetBucket, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListVMs", ctx, workspace)
-	ret0, _ := ret[0].([]api.VM)
+	ret := m.ctrl.Call(m, "ListAssetBuckets", ctx, workspace)
+	ret0, _ := ret[0].([]api.AssetBucket)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ListVMs indicates an expected call of ListVMs.
-func (mr *MockClientAPIMockRecorder) ListVMs(ctx, workspace any) *gomock.Call {
+// ListAssetBuckets indicates an expected call of ListAssetBuckets.
+func (mr *MockClientAPIMockRecorder) ListAssetBuckets(ctx, workspace any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListVMs", reflect.TypeOf((*MockClientAPI)(nil).ListVMs), ctx, workspace)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAssetBuckets", reflect.TypeOf((*MockClientAPI)(nil).ListAssetBuckets), ctx, workspace)
 }
 
 // ListVMApps mocks base method.
@@ -144,6 +159,21 @@ func (m *MockClientAPI) ListVMApps(ctx context.Context, workspace, vmUID string)
 func (mr *MockClientAPIMockRecorder) ListVMApps(ctx, workspace, vmUID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListVMApps", reflect.TypeOf((*MockClientAPI)(nil).ListVMApps), ctx, workspace, vmUID)
+}
+
+// ListVMs mocks base method.
+func (m *MockClientAPI) ListVMs(ctx context.Context, workspace string) ([]api.VM, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListVMs", ctx, workspace)
+	ret0, _ := ret[0].([]api.VM)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListVMs indicates an expected call of ListVMs.
+func (mr *MockClientAPIMockRecorder) ListVMs(ctx, workspace any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListVMs", reflect.TypeOf((*MockClientAPI)(nil).ListVMs), ctx, workspace)
 }
 
 // ListWorkspaces mocks base method.
@@ -263,4 +293,19 @@ func (m *MockClientAPI) StopVM(ctx context.Context, workspace, vmUID, idempotenc
 func (mr *MockClientAPIMockRecorder) StopVM(ctx, workspace, vmUID, idempotency any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StopVM", reflect.TypeOf((*MockClientAPI)(nil).StopVM), ctx, workspace, vmUID, idempotency)
+}
+
+// UnexposeVMApp mocks base method.
+func (m *MockClientAPI) UnexposeVMApp(ctx context.Context, workspace, vmUID, app, idempotency string) (api.UnexposeVMAppResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UnexposeVMApp", ctx, workspace, vmUID, app, idempotency)
+	ret0, _ := ret[0].(api.UnexposeVMAppResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UnexposeVMApp indicates an expected call of UnexposeVMApp.
+func (mr *MockClientAPIMockRecorder) UnexposeVMApp(ctx, workspace, vmUID, app, idempotency any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnexposeVMApp", reflect.TypeOf((*MockClientAPI)(nil).UnexposeVMApp), ctx, workspace, vmUID, app, idempotency)
 }

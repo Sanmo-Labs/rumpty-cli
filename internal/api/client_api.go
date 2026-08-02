@@ -17,6 +17,9 @@ type ClientAPI interface {
 	ExposeVMApp(ctx context.Context, workspace, vmUID string, req ExposeVMAppRequest, idempotency string) (ExposeVMAppResult, error)
 	UnexposeVMApp(ctx context.Context, workspace, vmUID, app string, idempotency string) (UnexposeVMAppResult, error)
 	GetOperation(ctx context.Context, workspace, operationID string) (Operation, error)
+	ListAssetBuckets(ctx context.Context, workspace string) ([]AssetBucket, error)
+	CreateAssetBucket(ctx context.Context, workspace string, req CreateAssetBucketRequest, idempotency string) (AssetBucketOperationResult, error)
+	CreateAssetAccessKey(ctx context.Context, workspace, bucketUID string, req CreateAssetAccessKeyRequest) (CreateAssetAccessKeyResult, error)
 	Logout(ctx context.Context) error
 	StartDevice(ctx context.Context) (DeviceAuthStartResponse, error)
 	PollDeviceToken(ctx context.Context, deviceCode string) (DeviceAuthPollResponse, error)
