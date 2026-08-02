@@ -1,5 +1,71 @@
 # rumpty-cli
 
+Manage workspaces, VMs, and storage on [Rumpty Cloud](https://rumptycloud.com) from your terminal.
+
+## Install
+
+Install the latest release with the install script:
+
+```sh
+curl -fsSL https://get.rumptycloud.com | sh
+```
+
+The script downloads the release for your OS and architecture, verifies its checksum, and installs the `rumpty` binary to `/usr/local/bin` (falling back to `~/.local/bin` when that directory is not writable).
+
+Optional overrides:
+
+```sh
+# Install a specific version
+curl -fsSL https://get.rumptycloud.com | RUMPTY_VERSION=v0.0.3 sh
+
+# Install to a custom directory
+curl -fsSL https://get.rumptycloud.com | RUMPTY_INSTALL_DIR="$HOME/.local/bin" sh
+```
+
+Verify the install:
+
+```sh
+rumpty --version
+```
+
+## Quick Start
+
+Sign in through your browser (stores a session for later commands):
+
+```sh
+rumpty login
+```
+
+SSH into a workspace VM:
+
+```sh
+rumpty ssh <vm>
+```
+
+Back up a local folder to object storage — the bucket is created automatically on first run, and repeat runs only transfer changes:
+
+```sh
+rumpty sync ~/sales-reports my-backups
+```
+
+Add `--watch` to keep syncing as files change, or `--daemon` to do the same in a background process (`rumpty sync status` / `rumpty sync stop` manage it). See the [docs](https://docs.rumptycloud.com/cli/introduction) for every command and flag.
+
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| `login` / `logout` | Authenticate with Rumpty / remove the local session |
+| `ssh` | Open an SSH session to a workspace VM |
+| `sync` | Sync a local folder to a bucket in object storage |
+| `copy` (alias `cp`) | Copy files between your machine and a VM |
+| `exec` | Run a non-interactive command on a VM |
+| `expose` / `unexpose` | Add or remove a public URL for a VM service |
+| `vm` | Manage workspace VMs: `ls`, `start`, `stop`, `reboot`, `delete` |
+| `workspaces` | List workspaces you can access |
+| `completion` | Generate shell autocompletion script |
+
+Use `rumpty [command] --help` for details on any command.
+
 ## Expose a VM Service
 
 Expose a service running inside a VM with a public HTTPS URL:
