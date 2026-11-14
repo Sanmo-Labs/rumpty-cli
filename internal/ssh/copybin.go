@@ -1,10 +1,14 @@
 package ssh
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os/exec"
+	"regexp"
 	"runtime"
+	"strconv"
+	"strings"
 )
 
 // ErrRsyncNotFound is returned when rsync is not on PATH.
@@ -21,6 +25,30 @@ func RsyncBinPath() (string, error) {
 			ErrRsyncNotFound, "rsync", rsyncInstallHint())
 	}
 	return path, nil
+}
+
+var rsyncVersionRe = regexp.MustCompile(`rsync\s+version\s+(\d+)\.(\d+)`)
+
+// openrsync (the macOS default) and rsync before 3.1 lack --info=progress2.
+func rsyncProgressFlag(ctx context.Context, rsyncBin string) string {
+	out, _ := exec.CommandContext(ctx, rsyncBin, "--version").CombinedOutput()
+	return progressFlagForVersion(string(out))
+}
+
+func progressFlagForVersion(versionOutput string) string {
+	if strings.Contains(versionOutput, "openrsync") {
+		return "--progress"
+	}
+	m := rsyncVersionRe.FindStringSubmatch(versionOutput)
+	if m == nil {
+		return "--progress"
+	}
+	major, _ := strconv.Atoi(m[1])
+	minor, _ := strconv.Atoi(m[2])
+	if major > 3 || (major == 3 && minor >= 1) {
+		return "--info=progress2"
+	}
+	return "--progress"
 }
 
 // SCPBinPath returns the path to the OpenSSH scp executable, or ErrSCPNotFound.

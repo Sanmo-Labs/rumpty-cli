@@ -35,7 +35,15 @@ func GetCertCacheForTest(apiURL, workspace, vmSlug, guestUser string) (KeyPair, 
 }
 
 func BuildRsyncArgsForTest(rsyncSSHWrapper string, session *api.CertResponse, paths CopyPaths, opts *Options) []string {
-	return buildRsyncArgs(rsyncSSHWrapper, session, paths, opts)
+	return buildRsyncArgs(rsyncSSHWrapper, session, paths, opts, "")
+}
+
+func BuildRsyncArgsWithProgressForTest(rsyncSSHWrapper string, session *api.CertResponse, paths CopyPaths, progressFlag string) []string {
+	return buildRsyncArgs(rsyncSSHWrapper, session, paths, nil, progressFlag)
+}
+
+func ProgressFlagForVersionForTest(versionOutput string) string {
+	return progressFlagForVersion(versionOutput)
 }
 
 func WriteRsyncSSHWrapperForTest(dir, sshBin, proxyCommand string, opts *Options) (string, error) {

@@ -52,9 +52,12 @@ func writeRsyncSSHWrapper(dir, sshBin, proxyCommand string, opts *Options) (stri
 	return path, nil
 }
 
-func buildRsyncArgs(rsyncSSHWrapper string, session *api.CertResponse, paths CopyPaths, opts *Options) []string {
+func buildRsyncArgs(rsyncSSHWrapper string, session *api.CertResponse, paths CopyPaths, opts *Options, progressFlag string) []string {
 	remote := remoteCopyTarget(session, paths.Remote)
 	args := []string{"-a", "-e", rsyncSSHWrapper}
+	if progressFlag != "" {
+		args = append(args, progressFlag)
+	}
 	if paths.Upload {
 		args = append(args, paths.Local, remote)
 	} else {

@@ -24,6 +24,8 @@ type copySession struct {
 	opts         *Options
 	recursive    bool
 	keyDir       string
+	errOut       io.Writer
+	showProgress bool
 }
 
 // Copy transfers files between the local machine and a workspace VM using rsync,
@@ -73,6 +75,8 @@ func Copy(ctx context.Context, rt *app.Runtime, src, dest string, opts *Options,
 		opts:         opts,
 		recursive:    copyRecursive(paths, recursive),
 		keyDir:       filepath.Dir(keyPath),
+		errOut:       stderr(rt),
+		showProgress: !debug && term.IsInteractive(os.Stdout),
 	})
 }
 
@@ -104,12 +108,21 @@ func tryRsync(ctx context.Context, cs *copySession) (string, error) {
 		return "", err
 	}
 
-	args := buildRsyncArgs(wrapper, cs.session, cs.paths, cs.opts)
+	progressFlag := ""
+	label := "Copying files"
+	if cs.showProgress {
+		progressFlag = rsyncProgressFlag(ctx, rsyncBin)
+		label = fmt.Sprintf("Connecting to %s", cs.session.VMSlug)
+	}
+	args := buildRsyncArgs(wrapper, cs.session, cs.paths, cs.opts, progressFlag)
 	cmd := exec.CommandContext(ctx, rsyncBin, args...)
-	cmd.Stdout = os.Stdout
+
+	spin := term.StartSpinner(cs.errOut, label)
+	defer spin.Stop()
+	cmd.Stdout = term.StopSpinnerOnWrite(os.Stdout, spin)
 
 	var stderrBuf bytes.Buffer
-	cmd.Stderr = io.MultiWriter(os.Stderr, &stderrBuf)
+	cmd.Stderr = io.MultiWriter(term.StopSpinnerOnWrite(os.Stderr, spin), &stderrBuf)
 
 	if err := cmd.Run(); err != nil {
 		if rsyncMissingOnRemote(stderrBuf.String()) {

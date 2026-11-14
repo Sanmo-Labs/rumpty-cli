@@ -42,6 +42,32 @@ func TestBuildRsyncArgs_upload(t *testing.T) {
 	assert.Contains(t, content, `"$@"`)
 }
 
+func TestBuildRsyncArgs_progressFlag(t *testing.T) {
+	t.Parallel()
+
+	session := &api.CertResponse{Username: "root", VMSlug: "my-vm"}
+	paths := rumptyssh.CopyPaths{VMRef: "my-vm", Local: "./disk.iso", Remote: "/var/lib/", Upload: true}
+	args := rumptyssh.BuildRsyncArgsWithProgressForTest("/tmp/wrap", session, paths, "--progress")
+
+	assert.Equal(t, []string{"-a", "-e", "/tmp/wrap", "--progress", "./disk.iso", "root@my-vm:/var/lib/"}, args)
+}
+
+func TestProgressFlagForVersion(t *testing.T) {
+	t.Parallel()
+
+	cases := map[string]string{
+		"openrsync: protocol version 29\nrsync version 2.6.9 compatible": "--progress",
+		"rsync  version 3.2.7  protocol version 31":                      "--info=progress2",
+		"rsync  version 3.1.0  protocol version 31":                      "--info=progress2",
+		"rsync  version 3.0.9  protocol version 30":                      "--progress",
+		"rsync  version 2.6.9  protocol version 29":                      "--progress",
+		"":                                                               "--progress",
+	}
+	for out, want := range cases {
+		assert.Equal(t, want, rumptyssh.ProgressFlagForVersionForTest(out), out)
+	}
+}
+
 func TestBuildSCPArgs_download(t *testing.T) {
 	t.Parallel()
 
