@@ -61,7 +61,7 @@ func TestProgressFlagForVersion(t *testing.T) {
 		"rsync  version 3.1.0  protocol version 31":                      "--info=progress2",
 		"rsync  version 3.0.9  protocol version 30":                      "--progress",
 		"rsync  version 2.6.9  protocol version 29":                      "--progress",
-		"":                                                               "--progress",
+		"": "--progress",
 	}
 	for out, want := range cases {
 		assert.Equal(t, want, rumptyssh.ProgressFlagForVersionForTest(out), out)
