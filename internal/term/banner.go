@@ -10,7 +10,7 @@ const (
 ▙▘▌▌▛▛▌▛▌▜▘▌▌▌ ▐ ▛▌▌▌▛▌
 ▌▌▙▌▌▌▌▙▌▐▖▙▌▙▖▐▖▙▌▙▌▙▌
        ▌   ▄▌          `
-	rumptyBannerFooter = "RumptyCloud\nSanmọ̀Labs™ - Surpass your limits!"
+	rumptyBannerFooter = "RumptyCloud\nCloverworks - Surpass your limits!"
 )
 
 func PrintBanner(w io.Writer) {

@@ -29,14 +29,13 @@ if [ -n "${NO_COLOR:-}" ] || [ ! -t 1 ]; then ORANGE=''; BOLD=''; DIM=''; RESET=
 banner() {
   printf '%b' "$ORANGE"
   cat <<'ART'
-                            _
- _ __ _   _ _ __ ___  _ __ | |_ _   _
-| '__| | | | '_ ` _ \| '_ \| __| | | |
-| |  | |_| | | | | | | |_) | |_| |_| |
-|_|   \__,_|_| |_| |_| .__/ \__|\__, |
-                     |_|        |___/  cloud
+▄▖       ▗   ▄▖▜      ▌
+▙▘▌▌▛▛▌▛▌▜▘▌▌▌ ▐ ▛▌▌▌▛▌
+▌▌▙▌▌▌▌▙▌▐▖▙▌▙▖▐▖▙▌▙▌▙▌
+       ▌   ▄▌
 ART
-  printf '%b' "$RESET"
+  printf '%b\n' "$RESET"
+  printf 'RumptyCloud\nCloverworks - Surpass your limits!\n'
 }
 
 # --- Downloader (curl or wget) ---------------------------------------------
