@@ -18,13 +18,14 @@ BIN="rumpty"
 BASE_URL="${RUMPTY_BASE_URL:-https://github.com/${REPO}/releases/download}"
 INSTALL_DIR="${RUMPTY_INSTALL_DIR:-/usr/local/bin}"
 
-info()  { printf '\033[1;34m==>\033[0m %s\n' "$1"; }
-warn()  { printf '\033[1;33mwarn:\033[0m %s\n' "$1" >&2; }
-error() { printf '\033[1;31merror:\033[0m %s\n' "$1" >&2; exit 1; }
+info()  { printf '%b==>%b %s\n' "$BLUE" "$RESET" "$1"; }
+warn()  { printf '%bwarn:%b %s\n' "$YELLOW" "$RESET" "$1" >&2; }
+error() { printf '%berror:%b %s\n' "$RED" "$RESET" "$1" >&2; exit 1; }
 
 # --- Branding ---------------------------------------------------------------
 ORANGE='\033[38;5;208m'; BOLD='\033[1m'; DIM='\033[2m'; RESET='\033[0m'
-if [ -n "${NO_COLOR:-}" ] || [ ! -t 1 ]; then ORANGE=''; BOLD=''; DIM=''; RESET=''; fi
+BLUE='\033[1;34m'; YELLOW='\033[1;33m'; RED='\033[1;31m'
+if [ -n "${NO_COLOR:-}" ] || [ ! -t 1 ]; then ORANGE=''; BOLD=''; DIM=''; RESET=''; BLUE=''; YELLOW=''; RED=''; fi
 
 banner() {
   printf '%b' "$ORANGE"
