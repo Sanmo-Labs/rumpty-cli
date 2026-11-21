@@ -40,6 +40,8 @@ archives:
 
 checksum:
   name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
+  extra_files:
+    - glob: ./install.sh
 
 sboms:
   - artifacts: archive
@@ -68,3 +70,5 @@ release:
     name: rumpty-cli
   draft: false
   prerelease: auto
+  extra_files:
+    - glob: ./install.sh
