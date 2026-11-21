@@ -12,9 +12,10 @@ import (
 const fileName = "credentials.json"
 
 type File struct {
-	APIURL   string `json:"api_url,omitempty"`
-	Token    string `json:"token,omitempty"`
-	Username string `json:"username,omitempty"`
+	APIURL          string `json:"api_url,omitempty"`
+	Token           string `json:"token,omitempty"`
+	TokenInKeychain bool   `json:"token_in_keychain,omitempty"`
+	Username        string `json:"username,omitempty"`
 }
 
 func Path() (string, error) {
@@ -55,13 +56,30 @@ func Load() (File, error) {
 	if err := json.Unmarshal(data, &creds); err != nil {
 		return File{}, fmt.Errorf("parse credentials: %w", err)
 	}
+	switch {
+	case creds.TokenInKeychain:
+		creds.Token, _ = LoadSecret(apiKeyAccount)
+	case creds.Token != "" && KeychainAvailable():
+		// Move a token saved by an older version into the keychain.
+		_ = Save(creds)
+	}
+	creds.TokenInKeychain = false
 	return creds, nil
 }
 
+// Save writes creds, keeping the token in the OS keychain when one is
+// available and in the file otherwise.
 func Save(creds File) error {
 	dir, err := Dir()
 	if err != nil {
 		return err
+	}
+	creds.TokenInKeychain = false
+	if creds.Token != "" && StoreSecret(apiKeyAccount, creds.Token) {
+		creds.Token = ""
+		creds.TokenInKeychain = true
+	} else {
+		DeleteSecret(apiKeyAccount)
 	}
 	data, err := json.MarshalIndent(creds, "", "  ")
 	if err != nil {
@@ -76,6 +94,7 @@ func Save(creds File) error {
 }
 
 func Clear() error {
+	DeleteSecret(apiKeyAccount)
 	path, err := Path()
 	if err != nil {
 		return err
