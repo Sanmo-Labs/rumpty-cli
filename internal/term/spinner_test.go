@@ -37,3 +37,22 @@ func TestSpinner_nilIsSafe(t *testing.T) {
 	spin.Update("x")
 	spin.Stop()
 }
+
+func TestSpinner_noEscapeWhenNotTerminal(t *testing.T) {
+	t.Parallel()
+
+	var buf bytes.Buffer
+	spin := StartSpinner(&buf, "Connecting")
+	spin.Stop()
+	assert.Contains(t, buf.String(), "Connecting")
+	assert.NotContains(t, buf.String(), "\r")
+}
+
+func TestSpinner_nilWriterIsSafe(t *testing.T) {
+	t.Parallel()
+
+	spin := StartSpinner(nil, "Connecting")
+	spin.Update("Still connecting")
+	spin.Stop()
+	spin.Stop()
+}
