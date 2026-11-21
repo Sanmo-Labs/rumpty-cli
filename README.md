@@ -10,7 +10,7 @@ Install the latest release with the install script:
 curl -fsSL https://get.rumptycloud.com | sh
 ```
 
-The script downloads the release for your OS and architecture, verifies its checksum, and installs the `rumpty` binary to `/usr/local/bin` (falling back to `~/.local/bin` when that directory is not writable).
+The script downloads the release for your OS and architecture, verifies its checksum, and installs the `rumpty` binary to `/usr/local/bin` (falling back to `~/.local/bin` when that directory is not writable). If [cosign](https://docs.sigstore.dev/cosign/system_config/installation/) is installed, it also verifies the release signature and stops if the check fails.
 
 Optional overrides:
 
@@ -27,6 +27,32 @@ Verify the install:
 ```sh
 rumpty --version
 ```
+
+### Verify a release
+
+Releases from v0.0.8 on are signed by this repository's release workflow and come with build provenance and an SBOM for each archive. To check a download by hand, fetch the archive, `rumpty-cli_<version>_checksums.txt` and `rumpty-cli_<version>_checksums.txt.sigstore.json` from the [release page](https://github.com/Sanmo-Labs/rumpty-cli/releases), then:
+
+```sh
+VERSION=0.0.8
+
+# 1. The checksums file was signed by the release workflow for this tag
+cosign verify-blob \
+  --bundle "rumpty-cli_${VERSION}_checksums.txt.sigstore.json" \
+  --certificate-identity "https://github.com/Sanmo-Labs/rumpty-cli/.github/workflows/release.yml@refs/tags/v${VERSION}" \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+  "rumpty-cli_${VERSION}_checksums.txt"
+
+# 2. The archive matches the signed checksum
+sha256sum --ignore-missing -c "rumpty-cli_${VERSION}_checksums.txt"   # macOS: shasum -a 256 --ignore-missing -c ...
+```
+
+Or check where an archive was built with the GitHub CLI:
+
+```sh
+gh attestation verify "rumpty-cli_${VERSION}_darwin_arm64.tar.gz" --repo Sanmo-Labs/rumpty-cli
+```
+
+Each archive's SBOM is published next to it as `<archive>.sbom.json` (SPDX).
 
 ## Quick Start
 
