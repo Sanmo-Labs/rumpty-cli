@@ -94,6 +94,21 @@ if dlo "$TMP/checksums.txt" "$SUMS_URL" 2>/dev/null; then
     else
       error "checksum verification failed"
     fi
+    if command -v cosign >/dev/null 2>&1; then
+      if dlo "$TMP/checksums.txt.sigstore.json" "${SUMS_URL}.sigstore.json" 2>/dev/null; then
+        if cosign verify-blob \
+          --bundle "$TMP/checksums.txt.sigstore.json" \
+          --certificate-identity "https://github.com/${REPO}/.github/workflows/release.yml@refs/tags/${TAG}" \
+          --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+          "$TMP/checksums.txt" >/dev/null 2>&1; then
+          info "Signature OK"
+        else
+          error "signature verification failed"
+        fi
+      else
+        warn "no signature for ${TAG}; skipping signature verification"
+      fi
+    fi
   else
     warn "no sha256 tool; skipping checksum verification"
   fi
