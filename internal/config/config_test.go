@@ -151,3 +151,44 @@ func TestUsageError(t *testing.T) {
 	assert.True(t, config.IsUsageError(err))
 	assert.False(t, config.IsUsageError(assert.AnError))
 }
+
+func TestConfig_Resolve_savedTokenOnlyForItsAPI(t *testing.T) {
+	tests := []struct {
+		name      string
+		saved     credentials.File
+		envURL    string
+		envToken  string
+		wantToken string
+	}{
+		{name: "same API", saved: credentials.File{APIURL: "https://api.example", Token: "saved"}, wantToken: "saved"},
+		{name: "same API, different form", saved: credentials.File{APIURL: "https://API.example/", Token: "saved"}, envURL: "https://api.example", wantToken: "saved"},
+		{name: "other API", saved: credentials.File{APIURL: "https://api.example", Token: "saved"}, envURL: "https://evil.example"},
+		{name: "other API with its own key", saved: credentials.File{APIURL: "https://api.example", Token: "saved"}, envURL: "https://evil.example", envToken: "env-key", wantToken: "env-key"},
+		{name: "legacy login without URL is for the default API", saved: credentials.File{Token: "saved"}, envURL: "https://evil.example"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Setenv("XDG_CONFIG_HOME", t.TempDir())
+			require.NoError(t, credentials.Save(tt.saved))
+			t.Setenv(config.EnvAPIURL, tt.envURL)
+			t.Setenv(config.EnvToken, tt.envToken)
+
+			cfg := config.Config{}
+			cfg.Resolve()
+			assert.Equal(t, tt.wantToken, cfg.Token)
+		})
+	}
+}
+
+func TestConfig_ValidateForAuth_explainsSavedLoginForOtherAPI(t *testing.T) {
+	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
+	require.NoError(t, credentials.Save(credentials.File{APIURL: "https://api.example", Token: "saved"}))
+	t.Setenv(config.EnvAPIURL, "https://other.example")
+	t.Setenv(config.EnvToken, "")
+
+	cfg := config.Config{}
+	cfg.Resolve()
+	err := cfg.ValidateForAuth()
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "saved login is for https://api.example")
+}

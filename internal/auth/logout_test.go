@@ -26,7 +26,7 @@ func TestLogout_clearsCredentials(t *testing.T) {
 	mock := mocks.NewMockClientAPI(ctrl)
 	mock.EXPECT().Logout(gomock.Any()).Return(nil)
 
-	rt, errOut := testRuntime(t, mock, config.Config{APIURL: "https://api.example"})
+	rt, errOut := testRuntime(t, mock, &config.Config{APIURL: "https://api.example"})
 	require.NoError(t, auth.Logout(context.Background(), rt))
 	assert.Contains(t, errOut.String(), "Logged out")
 
@@ -37,7 +37,7 @@ func TestLogout_clearsCredentials(t *testing.T) {
 
 func TestLogout_noTokenStillClears(t *testing.T) {
 	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
-	rt, errOut := testRuntime(t, nil, config.Config{})
+	rt, errOut := testRuntime(t, nil, &config.Config{})
 	require.NoError(t, auth.Logout(context.Background(), rt))
 	assert.Contains(t, errOut.String(), "Logged out")
 }
@@ -50,7 +50,7 @@ func TestLogout_ignores401FromServer(t *testing.T) {
 	mock := mocks.NewMockClientAPI(ctrl)
 	mock.EXPECT().Logout(gomock.Any()).Return(&api.Error{StatusCode: 401, Message: "unauthorized"})
 
-	rt, _ := testRuntime(t, mock, config.Config{APIURL: "https://api.example"})
+	rt, _ := testRuntime(t, mock, &config.Config{APIURL: "https://api.example"})
 	require.NoError(t, auth.Logout(context.Background(), rt))
 
 	creds, err := credentials.Load()

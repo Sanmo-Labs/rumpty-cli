@@ -9,6 +9,7 @@ import (
 
 	"github.com/Sanmo-Labs/rumpty-cli/internal/api"
 	"github.com/Sanmo-Labs/rumpty-cli/internal/app"
+	"github.com/Sanmo-Labs/rumpty-cli/internal/config"
 	"github.com/Sanmo-Labs/rumpty-cli/internal/credentials"
 	rumptylog "github.com/Sanmo-Labs/rumpty-cli/internal/log"
 )
@@ -20,14 +21,12 @@ func Logout(ctx context.Context, rt *app.Runtime) error {
 	}
 
 	token := strings.TrimSpace(creds.Token)
+	apiURL := config.SavedAPIURL(creds)
 	if token == "" {
 		token = strings.TrimSpace(rt.Config.Token)
+		apiURL = rt.Config.APIURL
 	}
 	if token != "" {
-		apiURL := creds.APIURL
-		if strings.TrimSpace(apiURL) == "" {
-			apiURL = rt.Config.APIURL
-		}
 		if err := rt.APIWithToken(apiURL, token).Logout(ctx); err != nil {
 			var apiErr *api.Error
 			if !errors.As(err, &apiErr) || apiErr.StatusCode != http.StatusUnauthorized {

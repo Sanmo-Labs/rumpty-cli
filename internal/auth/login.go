@@ -12,6 +12,7 @@ import (
 
 	"github.com/Sanmo-Labs/rumpty-cli/internal/api"
 	"github.com/Sanmo-Labs/rumpty-cli/internal/app"
+	"github.com/Sanmo-Labs/rumpty-cli/internal/config"
 	"github.com/Sanmo-Labs/rumpty-cli/internal/credentials"
 	rumptylog "github.com/Sanmo-Labs/rumpty-cli/internal/log"
 	"github.com/Sanmo-Labs/rumpty-cli/internal/term"
@@ -146,9 +147,9 @@ func AlreadyLoggedIn(ctx context.Context, rt *app.Runtime) (bool, error) {
 	if token == "" {
 		return false, nil
 	}
-	apiURL := rt.Config.APIURL
-	if strings.TrimSpace(apiURL) == "" {
-		apiURL = creds.APIURL
+	apiURL := config.SavedAPIURL(creds)
+	if strings.TrimSpace(rt.Config.APIURL) != "" && !config.SameAPIURL(rt.Config.APIURL, apiURL) {
+		return false, nil
 	}
 	user, err := rt.APIWithToken(apiURL, token).Me(ctx)
 	if err != nil {

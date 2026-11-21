@@ -102,7 +102,7 @@ func obtainSession(ctx context.Context, rt *app.Runtime, vmRef string, opts *Opt
 	apiURL := strings.TrimSpace(rt.Config.APIURL)
 	user := guestUser(opts)
 
-	if key, session, ok := sessionCache.get(apiURL, workspace, vmRef, user); ok {
+	if key, session, ok := sessionCache.get(apiURL, workspace, vmRef, user); ok && validateSession(&session) == nil {
 		rumptylog.Debug("reusing cached ssh certificate", "vm", vmRef, "workspace", workspace)
 		return key, session, nil
 	}
@@ -123,6 +123,9 @@ func obtainSession(ctx context.Context, rt *app.Runtime, vmRef string, opts *Opt
 		PublicKey: pubLine,
 	})
 	if err != nil {
+		return KeyPair{}, api.CertResponse{}, err
+	}
+	if err := validateSession(&session); err != nil {
 		return KeyPair{}, api.CertResponse{}, err
 	}
 	sessionCache.put(apiURL, workspace, vmRef, user, key, &session)

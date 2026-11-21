@@ -8,20 +8,27 @@ import (
 )
 
 // buildProxyCommand returns the inner ssh invocation used as ProxyCommand for the edge hop.
+// OpenSSH runs it through a shell and expands %-tokens in it, so every argument is
+// quoted and literal % signs are doubled.
 func buildProxyCommand(sshBin string, session *api.CertResponse, keyPath, certPath string, debug bool) string {
-	parts := []string{sshBin}
-	parts = append(parts, quietSSHOptions(debug)...)
-	parts = append(parts, hostKeyOptions()...)
-	parts = append(parts,
-		"-i", shellQuote(keyPath),
-		"-o", "CertificateFile="+shellQuote(certPath),
+	args := []string{sshBin}
+	args = append(args, quietSSHOptions(debug)...)
+	args = append(args, hostKeyOptions()...)
+	args = append(args,
+		"-i", keyPath,
+		"-o", "CertificateFile="+certPath,
 		"-o", "IdentitiesOnly=yes",
 		"-o", "RequestTTY=no",
 		"-T",
 		"-p", strconv.Itoa(session.EdgePort),
+		"--",
 		session.RouterUser+"@"+session.EdgeHost,
 	)
-	return strings.Join(parts, " ")
+	quoted := make([]string, len(args))
+	for i, arg := range args {
+		quoted[i] = shellQuote(arg)
+	}
+	return strings.ReplaceAll(strings.Join(quoted, " "), "%", "%%")
 }
 
 // buildSSHArgs assembles arguments for the outer ssh process (VM hop).
@@ -52,7 +59,7 @@ func buildSSHArgs(proxyCommand string, session *api.CertResponse, opts *Options)
 		)
 	}
 	remote := session.Username + "@" + session.VMSlug
-	args = append(args, remote)
+	args = append(args, "--", remote)
 	if opts != nil && len(opts.Command) > 0 {
 		args = append(args, opts.Command...)
 	}

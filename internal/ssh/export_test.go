@@ -61,3 +61,9 @@ func CopyRecursiveForTest(paths CopyPaths, flag bool) bool {
 func BuildSCPArgsForTest(proxyCommand string, session *api.CertResponse, paths CopyPaths, opts *Options, recursive bool) (src, dest string, args []string) {
 	return buildSCPArgs(proxyCommand, session, paths, opts, recursive)
 }
+
+func ShellQuoteForTest(s string) string { return shellQuote(s) }
+
+func PosixQuoteForTest(s string) string { return posixQuote(s) }
+
+func ValidateSessionForTest(s *api.CertResponse) error { return validateSession(s) }

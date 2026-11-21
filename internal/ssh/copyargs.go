@@ -37,10 +37,10 @@ func buildCopySSHOptions(proxyCommand string, opts *Options) []string {
 func writeRsyncSSHWrapper(dir, sshBin, proxyCommand string, opts *Options) (string, error) {
 	var b strings.Builder
 	b.WriteString("#!/bin/sh\nexec ")
-	b.WriteString(shellQuote(sshBin))
+	b.WriteString(posixQuote(sshBin))
 	for _, arg := range buildCopySSHOptions(proxyCommand, opts) {
 		b.WriteString(" ")
-		b.WriteString(shellQuote(arg))
+		b.WriteString(posixQuote(arg))
 	}
 	b.WriteString(` "$@"`)
 	b.WriteByte('\n')
