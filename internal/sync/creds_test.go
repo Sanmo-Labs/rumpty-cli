@@ -11,6 +11,7 @@ import (
 	"go.uber.org/mock/gomock"
 
 	"github.com/Sanmo-Labs/rumpty-cli/internal/api/mocks"
+	"github.com/Sanmo-Labs/rumpty-cli/internal/credentials"
 )
 
 func TestRevokeSavedKeys(t *testing.T) {
@@ -47,4 +48,46 @@ func TestRevokeSavedKeys_withoutSession(t *testing.T) {
 	require.NoError(t, err)
 	_, statErr := os.Stat(path)
 	assert.True(t, os.IsNotExist(statErr))
+}
+
+func TestBucketKey_secretInKeychain(t *testing.T) {
+	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
+	defer credentials.UseMockKeychain(nil)()
+
+	key := BucketKey{UID: "k1", Workspace: "acme", AccessKeyID: "AK1", SecretAccessKey: "bucket-secret", Endpoint: "https://s3.example", Bucket: "backups"}
+	require.NoError(t, saveBucketKey("b1", &key))
+
+	path, err := keysFilePath()
+	require.NoError(t, err)
+	data, err := os.ReadFile(path)
+	require.NoError(t, err)
+	assert.NotContains(t, string(data), "bucket-secret")
+
+	loaded, ok := loadBucketKey("b1")
+	require.True(t, ok)
+	assert.Equal(t, "bucket-secret", loaded.SecretAccessKey)
+
+	dropBucketKey("b1")
+	_, ok = credentials.LoadSecret(bucketKeyAccount("b1"))
+	assert.False(t, ok)
+}
+
+func TestBucketKey_movesFileSecretIntoKeychain(t *testing.T) {
+	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
+	t.Setenv(credentials.EnvNoKeychain, "1")
+	key := BucketKey{AccessKeyID: "AK1", SecretAccessKey: "old-secret", Endpoint: "https://s3.example", Bucket: "backups"}
+	require.NoError(t, saveBucketKey("b1", &key))
+
+	t.Setenv(credentials.EnvNoKeychain, "")
+	defer credentials.UseMockKeychain(nil)()
+
+	loaded, ok := loadBucketKey("b1")
+	require.True(t, ok)
+	assert.Equal(t, "old-secret", loaded.SecretAccessKey)
+
+	path, err := keysFilePath()
+	require.NoError(t, err)
+	data, err := os.ReadFile(path)
+	require.NoError(t, err)
+	assert.NotContains(t, string(data), "old-secret")
 }

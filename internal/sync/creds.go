@@ -16,13 +16,14 @@ import (
 const keysFileName = "s3-keys.json"
 
 type BucketKey struct {
-	UID             string `json:"uid,omitempty"`
-	Workspace       string `json:"workspace,omitempty"`
-	AccessKeyID     string `json:"access_key_id"`
-	SecretAccessKey string `json:"secret_access_key"`
-	Endpoint        string `json:"endpoint"`
-	Region          string `json:"region"`
-	Bucket          string `json:"bucket"`
+	UID              string `json:"uid,omitempty"`
+	Workspace        string `json:"workspace,omitempty"`
+	AccessKeyID      string `json:"access_key_id"`
+	SecretAccessKey  string `json:"secret_access_key,omitempty"`
+	SecretInKeychain bool   `json:"secret_in_keychain,omitempty"`
+	Endpoint         string `json:"endpoint"`
+	Region           string `json:"region"`
+	Bucket           string `json:"bucket"`
 }
 
 func loadBucketKey(bucketUID string) (BucketKey, bool) {
@@ -31,28 +32,52 @@ func loadBucketKey(bucketUID string) (BucketKey, bool) {
 		return BucketKey{}, false
 	}
 	key, ok := keys[bucketUID]
-	if !ok || key.AccessKeyID == "" || key.SecretAccessKey == "" || key.Endpoint == "" || key.Bucket == "" {
+	if !ok {
+		return BucketKey{}, false
+	}
+	switch {
+	case key.SecretInKeychain:
+		key.SecretAccessKey, _ = credentials.LoadSecret(bucketKeyAccount(bucketUID))
+	case key.SecretAccessKey != "" && credentials.KeychainAvailable():
+		// Move a secret saved by an older version into the keychain.
+		_ = saveBucketKey(bucketUID, &key)
+	}
+	key.SecretInKeychain = false
+	if key.AccessKeyID == "" || key.SecretAccessKey == "" || key.Endpoint == "" || key.Bucket == "" {
 		return BucketKey{}, false
 	}
 	return key, true
 }
 
+// saveBucketKey keeps the secret in the OS keychain when one is available
+// and in s3-keys.json otherwise.
 func saveBucketKey(bucketUID string, key *BucketKey) error {
 	keys, err := loadKeysFile()
 	if err != nil {
 		return err
 	}
-	keys[bucketUID] = *key
+	stored := *key
+	stored.SecretInKeychain = false
+	if stored.SecretAccessKey != "" && credentials.StoreSecret(bucketKeyAccount(bucketUID), stored.SecretAccessKey) {
+		stored.SecretAccessKey = ""
+		stored.SecretInKeychain = true
+	}
+	keys[bucketUID] = stored
 	return writeKeysFile(keys)
 }
 
 func dropBucketKey(bucketUID string) {
+	credentials.DeleteSecret(bucketKeyAccount(bucketUID))
 	keys, err := loadKeysFile()
 	if err != nil {
 		return
 	}
 	delete(keys, bucketUID)
 	_ = writeKeysFile(keys)
+}
+
+func bucketKeyAccount(bucketUID string) string {
+	return "bucket:" + bucketUID
 }
 
 func keysFilePath() (string, error) {
@@ -108,7 +133,8 @@ func RevokeSavedKeys(ctx context.Context, client api.ClientAPI) ([]string, error
 		return nil, err
 	}
 	var notRevoked []string
-	for _, key := range keys {
+	for bucketUID, key := range keys {
+		credentials.DeleteSecret(bucketKeyAccount(bucketUID))
 		if client != nil && key.UID != "" && key.Workspace != "" {
 			if err := client.RevokeAssetAccessKey(ctx, key.Workspace, key.UID); err == nil {
 				continue
