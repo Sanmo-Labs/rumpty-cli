@@ -89,8 +89,11 @@ if dlo "$TMP/checksums.txt" "$SUMS_URL" 2>/dev/null; then
   if command -v sha256sum >/dev/null 2>&1; then SHA="sha256sum";
   elif command -v shasum >/dev/null 2>&1; then SHA="shasum -a 256"; else SHA=""; fi
   if [ -n "$SHA" ]; then
-    ( cd "$TMP" && grep " ${ARCHIVE}\$" checksums.txt | $SHA -c - ) >/dev/null 2>&1 \
-      && info "Checksum OK" || error "checksum verification failed"
+    if ( cd "$TMP" && grep " ${ARCHIVE}\$" checksums.txt | $SHA -c - ) >/dev/null 2>&1; then
+      info "Checksum OK"
+    else
+      error "checksum verification failed"
+    fi
   else
     warn "no sha256 tool; skipping checksum verification"
   fi
@@ -136,6 +139,6 @@ printf '  %b%s/%s%b\n\n' "$DIM" "$INSTALL_DIR" "$BIN" "$RESET"
 printf '  %bGet started%b\n\n' "$BOLD" "$RESET"
 printf '  %b1.%b Create an API key   %bhttps://console.rumptycloud.com/profile%b  (API keys tab)\n' "$ORANGE" "$RESET" "$DIM" "$RESET"
 printf '  %b2.%b Add it to your env  export RUMPTY_API_KEY="rumpty_..."\n' "$ORANGE" "$RESET"
-printf '  %b3.%b Sign in             rumpty login --token "$RUMPTY_API_KEY"\n' "$ORANGE" "$RESET"
+printf "  %b3.%b Sign in             rumpty login --token \"\$RUMPTY_API_KEY\"\n" "$ORANGE" "$RESET"
 printf '  %b4.%b Open your first VM  rumpty ssh <vm-name> --ws <workspace>\n\n' "$ORANGE" "$RESET"
 printf '  %bManage everything at%b %bhttps://console.rumptycloud.com%b\n\n' "$DIM" "$RESET" "$ORANGE" "$RESET"
