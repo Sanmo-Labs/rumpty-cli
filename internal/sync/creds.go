@@ -1,18 +1,23 @@
 package sync
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 
+	"github.com/Sanmo-Labs/rumpty-cli/internal/api"
 	"github.com/Sanmo-Labs/rumpty-cli/internal/credentials"
 )
 
 const keysFileName = "s3-keys.json"
 
 type BucketKey struct {
+	UID             string `json:"uid,omitempty"`
+	Workspace       string `json:"workspace,omitempty"`
 	AccessKeyID     string `json:"access_key_id"`
 	SecretAccessKey string `json:"secret_access_key"`
 	Endpoint        string `json:"endpoint"`
@@ -63,6 +68,7 @@ func loadKeysFile() (map[string]BucketKey, error) {
 	if err != nil {
 		return nil, err
 	}
+	credentials.RestrictPermissions(path)
 	data, err := os.ReadFile(path)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
@@ -82,16 +88,42 @@ func writeKeysFile(keys map[string]BucketKey) error {
 	if err != nil {
 		return err
 	}
-	if err := os.MkdirAll(filepath.Dir(path), 0o700); err != nil {
-		return fmt.Errorf("create config directory: %w", err)
-	}
 	data, err := json.MarshalIndent(keys, "", "  ")
 	if err != nil {
 		return err
 	}
 	data = append(data, '\n')
-	if err := os.WriteFile(path, data, 0o600); err != nil {
+	if err := credentials.WriteSecretFile(path, data); err != nil {
 		return fmt.Errorf("write bucket keys: %w", err)
 	}
 	return nil
+}
+
+// RevokeSavedKeys revokes the bucket access keys sync created and deletes
+// the local copies. It returns a description of each key that could not be
+// revoked, so the caller can tell the user to revoke it in the console.
+func RevokeSavedKeys(ctx context.Context, client api.ClientAPI) ([]string, error) {
+	keys, err := loadKeysFile()
+	if err != nil {
+		return nil, err
+	}
+	var notRevoked []string
+	for _, key := range keys {
+		if client != nil && key.UID != "" && key.Workspace != "" {
+			if err := client.RevokeAssetAccessKey(ctx, key.Workspace, key.UID); err == nil {
+				continue
+			}
+		}
+		notRevoked = append(notRevoked, fmt.Sprintf("access key %s for bucket %s", key.AccessKeyID, key.Bucket))
+	}
+	sort.Strings(notRevoked)
+
+	path, err := keysFilePath()
+	if err != nil {
+		return notRevoked, err
+	}
+	if err := os.Remove(path); err != nil && !errors.Is(err, os.ErrNotExist) {
+		return notRevoked, fmt.Errorf("remove bucket keys: %w", err)
+	}
+	return notRevoked, nil
 }

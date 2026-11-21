@@ -229,7 +229,7 @@ func writeCertStore(entries []certStoreEntry) error {
 		return err
 	}
 	data = append(data, '\n')
-	return os.WriteFile(path, data, 0o600)
+	return credentials.WriteSecretFile(path, data)
 }
 
 func decodeStoredKeyPair(privateB64, publicB64 string) (KeyPair, error) {
@@ -265,4 +265,10 @@ func resetCertStoreForTest() error {
 		return err
 	}
 	return nil
+}
+
+// ClearCertCache removes cached SSH certificates and their private keys.
+func ClearCertCache() error {
+	resetCertCacheForTest()
+	return resetCertStoreForTest()
 }

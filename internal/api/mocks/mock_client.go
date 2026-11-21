@@ -250,6 +250,20 @@ func (mr *MockClientAPIMockRecorder) RebootVM(ctx, workspace, vmUID, idempotency
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RebootVM", reflect.TypeOf((*MockClientAPI)(nil).RebootVM), ctx, workspace, vmUID, idempotency)
 }
 
+// RevokeAssetAccessKey mocks base method.
+func (m *MockClientAPI) RevokeAssetAccessKey(ctx context.Context, workspace, keyUID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RevokeAssetAccessKey", ctx, workspace, keyUID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RevokeAssetAccessKey indicates an expected call of RevokeAssetAccessKey.
+func (mr *MockClientAPIMockRecorder) RevokeAssetAccessKey(ctx, workspace, keyUID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RevokeAssetAccessKey", reflect.TypeOf((*MockClientAPI)(nil).RevokeAssetAccessKey), ctx, workspace, keyUID)
+}
+
 // StartDevice mocks base method.
 func (m *MockClientAPI) StartDevice(ctx context.Context) (api.DeviceAuthStartResponse, error) {
 	m.ctrl.T.Helper()
