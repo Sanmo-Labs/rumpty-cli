@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net"
+	"net/url"
 	"strings"
 	"time"
 
@@ -13,7 +15,8 @@ import (
 )
 
 type Client struct {
-	r *resty.Client
+	r   *resty.Client
+	err error
 }
 
 func NewClient(baseURL, token string) *Client {
@@ -24,7 +27,35 @@ func NewClient(baseURL, token string) *Client {
 	if token != "" {
 		r.SetAuthScheme("Bearer").SetAuthToken(token)
 	}
-	return &Client{r: r}
+	return &Client{r: r, err: CheckBaseURL(baseURL)}
+}
+
+// CheckBaseURL requires HTTPS so API keys are never sent in clear text.
+// Plain HTTP is allowed only for loopback addresses, for local development.
+func CheckBaseURL(raw string) error {
+	u, err := url.Parse(strings.TrimSpace(raw))
+	if err != nil || u.Host == "" {
+		return fmt.Errorf("invalid API URL %q", raw)
+	}
+	switch strings.ToLower(u.Scheme) {
+	case "https":
+		return nil
+	case "http":
+		if isLoopback(u.Hostname()) {
+			return nil
+		}
+		return fmt.Errorf("refusing to send credentials over plain HTTP to %s; use an https:// API URL", u.Host)
+	default:
+		return fmt.Errorf("unsupported API URL scheme %q; use https://", u.Scheme)
+	}
+}
+
+func isLoopback(host string) bool {
+	if strings.EqualFold(host, "localhost") {
+		return true
+	}
+	ip := net.ParseIP(host)
+	return ip != nil && ip.IsLoopback()
 }
 
 type envelope struct {
@@ -39,6 +70,9 @@ type requestOptions struct {
 }
 
 func (c *Client) post(ctx context.Context, path string, body any, out any, opts requestOptions) error {
+	if c.err != nil {
+		return c.err
+	}
 	req := c.r.R().SetContext(ctx)
 	if body != nil {
 		req.SetBody(body)
@@ -56,6 +90,9 @@ func (c *Client) post(ctx context.Context, path string, body any, out any, opts 
 }
 
 func (c *Client) deleteWithOptions(ctx context.Context, path string, out any, opts requestOptions) error {
+	if c.err != nil {
+		return c.err
+	}
 	req := c.r.R().SetContext(ctx)
 	for k, v := range opts.headers {
 		req.SetHeader(k, v)
@@ -74,6 +111,9 @@ func (c *Client) get(ctx context.Context, path string, out any) error {
 }
 
 func (c *Client) getWithOptions(ctx context.Context, path string, out any, opts requestOptions) error {
+	if c.err != nil {
+		return c.err
+	}
 	req := c.r.R().SetContext(ctx)
 	for k, v := range opts.headers {
 		req.SetHeader(k, v)

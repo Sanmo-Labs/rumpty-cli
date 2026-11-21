@@ -42,6 +42,7 @@ func TestBuildSSHArgs_interactive(t *testing.T) {
 	assert.NotContains(t, args, "-q")
 	assert.NotContains(t, joined, "BatchMode=yes")
 	assert.Equal(t, "ubuntu@my-vm", args[len(args)-1])
+	assert.Equal(t, "--", args[len(args)-2])
 }
 
 func TestBuildProxyCommand_quotesPaths(t *testing.T) {
@@ -53,7 +54,7 @@ func TestBuildProxyCommand_quotesPaths(t *testing.T) {
 		EdgePort:   22,
 	}
 	proxy := rumptyssh.BuildProxyCommandForTest("/usr/bin/ssh", session, "/tmp/rumpty ssh/id", "/tmp/rumpty ssh/id-cert.pub")
-	assert.Contains(t, proxy, `"/tmp/rumpty ssh/id"`)
+	assert.Contains(t, proxy, `'/tmp/rumpty ssh/id'`)
 	assert.Contains(t, proxy, `CertificateFile=`)
 	assert.Contains(t, proxy, "LogLevel=ERROR")
 	assert.NotContains(t, proxy, "-vvv")

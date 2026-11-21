@@ -21,11 +21,11 @@ import (
 	"github.com/Sanmo-Labs/rumpty-cli/internal/term"
 )
 
-func testRuntime(t *testing.T, apiClient api.ClientAPI, cfg config.Config) (*app.Runtime, *bytes.Buffer) {
+func testRuntime(t *testing.T, apiClient api.ClientAPI, cfg *config.Config) (*app.Runtime, *bytes.Buffer) {
 	t.Helper()
 	errOut := &bytes.Buffer{}
 	return &app.Runtime{
-		Config:    &cfg,
+		Config:    cfg,
 		Streams:   term.Streams{In: strings.NewReader("\n"), Out: io.Discard, ErrOut: errOut},
 		APIClient: apiClient,
 		Browser:   term.NoopBrowser{},
@@ -67,7 +67,7 @@ func TestLogin_apiKey(t *testing.T) {
 			mock := mocks.NewMockClientAPI(ctrl)
 			mock.EXPECT().Me(gomock.Any()).Return(tt.meUser, tt.meErr)
 
-			rt, errOut := testRuntime(t, mock, config.Config{APIURL: "https://api.example"})
+			rt, errOut := testRuntime(t, mock, &config.Config{APIURL: "https://api.example"})
 			err := auth.Login(context.Background(), rt, "rumpty_prefix_secret", auth.LoginOptions{})
 
 			if tt.wantErr != "" {
@@ -104,7 +104,7 @@ func TestLogin_device_authorization(t *testing.T) {
 		User:  api.User{Username: "bob"},
 	}, nil)
 
-	rt, errOut := testRuntime(t, mock, config.Config{APIURL: "https://api.example"})
+	rt, errOut := testRuntime(t, mock, &config.Config{APIURL: "https://api.example"})
 	err := auth.Login(context.Background(), rt, "", auth.LoginOptions{})
 	require.NoError(t, err)
 
@@ -138,7 +138,7 @@ func TestLogin_device_completesWithoutEnter(t *testing.T) {
 	pr, pw := io.Pipe()
 	t.Cleanup(func() { _ = pr.Close(); _ = pw.Close() })
 
-	rt, errOut := testRuntime(t, mock, config.Config{APIURL: "https://api.example"})
+	rt, errOut := testRuntime(t, mock, &config.Config{APIURL: "https://api.example"})
 	rt.Streams.In = pr
 
 	err := auth.Login(context.Background(), rt, "", auth.LoginOptions{})
@@ -160,7 +160,7 @@ func TestLogin_device_unexpectedStatus(t *testing.T) {
 		Status: "denied",
 	}, nil)
 
-	rt, _ := testRuntime(t, mock, config.Config{APIURL: "https://api.example"})
+	rt, _ := testRuntime(t, mock, &config.Config{APIURL: "https://api.example"})
 	err := auth.Login(context.Background(), rt, "", auth.LoginOptions{})
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "unexpected authorization status")
@@ -180,7 +180,7 @@ func TestSaveSession(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Setenv("XDG_CONFIG_HOME", t.TempDir())
-			rt, errOut := testRuntime(t, nil, config.Config{APIURL: "https://api.example"})
+			rt, errOut := testRuntime(t, nil, &config.Config{APIURL: "https://api.example"})
 			err := auth.SaveSession(rt, "https://api.example", tt.token, tt.user)
 			if tt.wantErr != "" {
 				require.EqualError(t, err, tt.wantErr)
@@ -204,7 +204,7 @@ func TestAlreadyLoggedIn(t *testing.T) {
 	mock := mocks.NewMockClientAPI(ctrl)
 	mock.EXPECT().Me(gomock.Any()).Return(api.User{Username: "alice"}, nil)
 
-	rt, errOut := testRuntime(t, mock, config.Config{APIURL: "https://api.example"})
+	rt, errOut := testRuntime(t, mock, &config.Config{APIURL: "https://api.example"})
 	ok, err := auth.AlreadyLoggedIn(context.Background(), rt)
 	require.NoError(t, err)
 	assert.True(t, ok)
@@ -213,13 +213,26 @@ func TestAlreadyLoggedIn(t *testing.T) {
 
 func TestAlreadyLoggedIn_staleToken(t *testing.T) {
 	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
-	require.NoError(t, credentials.Save(credentials.File{Token: "stale"}))
+	require.NoError(t, credentials.Save(credentials.File{APIURL: "https://api.example", Token: "stale"}))
 
 	ctrl := gomock.NewController(t)
 	mock := mocks.NewMockClientAPI(ctrl)
 	mock.EXPECT().Me(gomock.Any()).Return(api.User{}, &api.Error{StatusCode: 401, Message: "unauthorized"})
 
-	rt, _ := testRuntime(t, mock, config.Config{APIURL: "https://api.example"})
+	rt, _ := testRuntime(t, mock, &config.Config{APIURL: "https://api.example"})
+	ok, err := auth.AlreadyLoggedIn(context.Background(), rt)
+	require.NoError(t, err)
+	assert.False(t, ok)
+}
+
+func TestAlreadyLoggedIn_savedLoginForOtherAPI(t *testing.T) {
+	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
+	require.NoError(t, credentials.Save(credentials.File{APIURL: "https://api.example", Token: "stored-token"}))
+
+	ctrl := gomock.NewController(t)
+	mock := mocks.NewMockClientAPI(ctrl)
+
+	rt, _ := testRuntime(t, mock, &config.Config{APIURL: "https://other.example"})
 	ok, err := auth.AlreadyLoggedIn(context.Background(), rt)
 	require.NoError(t, err)
 	assert.False(t, ok)

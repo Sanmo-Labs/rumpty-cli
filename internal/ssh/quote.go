@@ -1,8 +1,20 @@
 package ssh
 
-import "strconv"
+import (
+	"runtime"
+	"strings"
+)
 
-// shellQuote wraps s for use in an OpenSSH ProxyCommand string (parsed by the system shell on Unix).
+// shellQuote quotes s for the shell that runs an OpenSSH ProxyCommand:
+// /bin/sh on Unix, the Windows command-line parser on Windows.
 func shellQuote(s string) string {
-	return strconv.Quote(s)
+	if runtime.GOOS == "windows" {
+		return `"` + strings.ReplaceAll(s, `"`, `\"`) + `"`
+	}
+	return posixQuote(s)
+}
+
+// posixQuote single-quotes s so /bin/sh passes it through unchanged.
+func posixQuote(s string) string {
+	return "'" + strings.ReplaceAll(s, "'", `'\''`) + "'"
 }
