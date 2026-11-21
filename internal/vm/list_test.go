@@ -3,6 +3,7 @@ package vm_test
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"io"
 	"strings"
 	"testing"
@@ -45,7 +46,7 @@ func TestList_printsVMs(t *testing.T) {
 		APIClient: mock,
 	}
 
-	require.NoError(t, vm.List(context.Background(), rt))
+	require.NoError(t, vm.List(context.Background(), rt, term.OutputTable))
 	s := out.String()
 	assert.Contains(t, s, "NAME")
 	assert.Contains(t, s, "PLAN")
@@ -74,6 +75,26 @@ func TestList_empty(t *testing.T) {
 		APIClient: mock,
 	}
 
-	require.NoError(t, vm.List(context.Background(), rt))
-	assert.Contains(t, strings.TrimSpace(out.String()), "No VMs.")
+	require.NoError(t, vm.List(context.Background(), rt, term.OutputTable))
+	assert.Contains(t, strings.TrimSpace(out.String()), "No VMs in acme.")
+}
+
+func TestList_json(t *testing.T) {
+	ctrl := gomock.NewController(t)
+
+	mock := mocks.NewMockClientAPI(ctrl)
+	mock.EXPECT().ListVMs(gomock.Any(), "acme").Return([]api.VM{{UID: "vm-1", Slug: "web", DisplayStatus: "running"}}, nil)
+
+	out := &bytes.Buffer{}
+	rt := &app.Runtime{
+		Config:    &config.Config{Token: "tok", Workspace: "acme"},
+		Streams:   term.Streams{Out: out, ErrOut: io.Discard},
+		APIClient: mock,
+	}
+
+	require.NoError(t, vm.List(context.Background(), rt, term.OutputJSON))
+	var got []api.VM
+	require.NoError(t, json.Unmarshal(out.Bytes(), &got))
+	require.Len(t, got, 1)
+	assert.Equal(t, "web", got[0].Slug)
 }

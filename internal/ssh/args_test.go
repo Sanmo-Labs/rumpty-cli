@@ -1,6 +1,8 @@
 package ssh_test
 
 import (
+	"os/exec"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -23,9 +25,33 @@ func TestBuildSSHArgs_exec(t *testing.T) {
 
 	assert.Contains(t, args, "-T")
 	assert.Contains(t, args, "BatchMode=yes")
-	assert.Equal(t, "ubuntu@my-vm", args[len(args)-3])
-	assert.Equal(t, "echo", args[len(args)-2])
-	assert.Equal(t, "hello", args[len(args)-1])
+	assert.Equal(t, "ubuntu@my-vm", args[len(args)-2])
+	assert.Equal(t, "'echo' 'hello'", args[len(args)-1])
+}
+
+func TestBuildSSHArgs_execSingleArgumentIsAShellCommand(t *testing.T) {
+	t.Parallel()
+
+	session := &api.CertResponse{Username: "ubuntu", VMSlug: "my-vm"}
+	opts := &rumptyssh.Options{Command: []string{"ls -la | wc -l"}}
+	args := rumptyssh.BuildSSHArgsForTest("proxy", session, opts)
+	assert.Equal(t, "ls -la | wc -l", args[len(args)-1])
+}
+
+func TestBuildSSHArgs_execKeepsArgumentsAsTyped(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("POSIX shell quoting")
+	}
+	t.Parallel()
+
+	session := &api.CertResponse{Username: "ubuntu", VMSlug: "my-vm"}
+	opts := &rumptyssh.Options{Command: []string{"printf", `[%s]\n`, "a b", "$HOME", "it's"}}
+	args := rumptyssh.BuildSSHArgsForTest("proxy", session, opts)
+
+	// The VM's shell sees the same string a remote sh -c would.
+	out, err := exec.CommandContext(t.Context(), "/bin/sh", "-c", args[len(args)-1]).Output() //nolint:gosec // runs the generated command on purpose
+	require.NoError(t, err)
+	assert.Equal(t, "[a b]\n[$HOME]\n[it's]\n", string(out))
 }
 
 func TestBuildSSHArgs_interactive(t *testing.T) {

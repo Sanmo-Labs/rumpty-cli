@@ -37,7 +37,7 @@ func TestListApps_printsApps(t *testing.T) {
 		APIClient: mock,
 	}
 
-	require.NoError(t, vm.ListApps(context.Background(), rt, "test-vm8"))
+	require.NoError(t, vm.ListApps(context.Background(), rt, "test-vm8", term.OutputTable))
 	assert.Contains(t, out.String(), "NAME")
 	assert.Contains(t, out.String(), "PORT")
 	assert.Contains(t, out.String(), "openclaw")
@@ -62,6 +62,6 @@ func TestListApps_empty(t *testing.T) {
 		APIClient: mock,
 	}
 
-	require.NoError(t, vm.ListApps(context.Background(), rt, "test-vm8"))
+	require.NoError(t, vm.ListApps(context.Background(), rt, "test-vm8", term.OutputTable))
 	assert.Contains(t, out.String(), "No exposed apps for test-vm8.")
 }

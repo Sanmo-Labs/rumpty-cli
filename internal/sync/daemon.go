@@ -12,7 +12,6 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
-	"text/tabwriter"
 	"time"
 
 	"github.com/Sanmo-Labs/rumpty-cli/internal/app"
@@ -289,18 +288,25 @@ func watchGuarded(ctx context.Context, rt *app.Runtime, opts *Options) (err erro
 
 // StatusDaemons prints every known sync daemon and whether it is actually
 // running.
-func StatusDaemons(rt *app.Runtime) error {
+func StatusDaemons(rt *app.Runtime, format term.OutputFormat) error {
 	states, err := listStates()
 	if err != nil {
 		return err
 	}
+	w := rt.Streams.Out
+	if format == term.OutputJSON {
+		if states == nil {
+			states = []*DaemonState{}
+		}
+		return term.WriteJSON(w, states)
+	}
 	if len(states) == 0 {
-		fmt.Fprintln(rt.Streams.Out, "No sync daemons.")
+		fmt.Fprintln(w, "No sync daemons.")
+		fmt.Fprintln(w, term.Muted(w, "Start one with: rumpty sync <path> --daemon"))
 		return nil
 	}
 
-	tw := tabwriter.NewWriter(rt.Streams.Out, 0, 0, 2, ' ', 0)
-	fmt.Fprintln(tw, "PATH\tBUCKET\tSTATUS\tPID\tLAST SYNC\tLAST ERROR")
+	table := term.NewTable(w, "PATH", "BUCKET", "STATUS", "PID", "LAST SYNC", "LAST ERROR")
 	for _, state := range states {
 		status, pid := "stopped", "—"
 		if processAlive(state.PID) {
@@ -315,10 +321,9 @@ func StatusDaemons(rt *app.Runtime) error {
 		if lastErr == "" {
 			lastErr = "—"
 		}
-		fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%s\t%s\n",
-			state.LocalPath, target, status, pid, humanAgo(state.LastSyncAt), lastErr)
+		table.Row(state.LocalPath, target, term.StatusBadge(w, status), pid, humanAgo(state.LastSyncAt), lastErr)
 	}
-	return tw.Flush()
+	return table.Render()
 }
 
 // StopDaemons terminates matching daemons. target matches the local path or

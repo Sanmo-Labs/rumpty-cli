@@ -41,9 +41,11 @@ func Copy(ctx context.Context, rt *app.Runtime, src, dest string, opts *Options,
 		return err
 	}
 
+	var spin *term.Spinner
 	if opts == nil || !opts.Debug {
-		term.Statusf(stderr(rt), "Preparing file transfer for %s", vmRef)
+		spin = term.StartSpinner(stderr(rt), "Preparing file transfer for "+vmRef)
 	}
+	defer stopSpinner(spin)
 
 	key, session, err := obtainSession(ctx, rt, vmRef, opts)
 	if err != nil {
@@ -63,6 +65,7 @@ func Copy(ctx context.Context, rt *app.Runtime, src, dest string, opts *Options,
 
 	debug := opts != nil && opts.Debug
 	proxyCommand := buildProxyCommand(sshBin, &session, keyPath, certPath, debug)
+	stopSpinner(spin)
 	if !debug {
 		term.Statusf(stderr(rt), "Transferring files as %s", session.Username)
 	}

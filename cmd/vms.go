@@ -60,34 +60,50 @@ func newVMExposeCmd(rt *app.Runtime) *cobra.Command {
 }
 
 func newVMExposeListCmd(rt *app.Runtime) *cobra.Command {
-	return &cobra.Command{
-		Use:               "ls <vm>",
-		Short:             "List exposed URLs for a VM",
-		Example:           `  rumpty vm expose ls test-vm8 --ws production-team-019e2b95`,
+	var output string
+	cmd := &cobra.Command{
+		Use:   "ls <vm>",
+		Short: "List exposed URLs for a VM",
+		Example: `  rumpty vm expose ls test-vm8 --ws production-team-019e2b95
+  rumpty vm expose ls test-vm8 -o json`,
 		Args:              cobra.ExactArgs(1),
 		ValidArgsFunction: completeVMNames(rt),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			format, err := outputFormat(output)
+			if err != nil {
+				return err
+			}
 			if err := rt.Config.ValidateForSSH(); err != nil {
 				return config.NewUsageError("%v", err)
 			}
-			return vm.ListApps(cmd.Context(), rt, args[0])
+			return vm.ListApps(cmd.Context(), rt, args[0], format)
 		},
 	}
+	addOutputFlag(cmd, &output)
+	return cmd
 }
 
 func newVMListCmd(rt *app.Runtime) *cobra.Command {
-	return &cobra.Command{
+	var output string
+	cmd := &cobra.Command{
 		Use:   "ls",
 		Short: "List VMs in the workspace",
 		Example: `  rumpty vm ls
-  rumpty vm ls --ws production-team-019e2b95`,
+  rumpty vm ls --ws production-team-019e2b95
+  rumpty vm ls -o json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			format, err := outputFormat(output)
+			if err != nil {
+				return err
+			}
 			if err := rt.Config.ValidateForSSH(); err != nil {
 				return config.NewUsageError("%v", err)
 			}
-			return vm.List(cmd.Context(), rt)
+			return vm.List(cmd.Context(), rt, format)
 		},
 	}
+	addOutputFlag(cmd, &output)
+	return cmd
 }
 
 func newVMLifecycleCmd(rt *app.Runtime, use, short string, run func(context.Context, *app.Runtime, string) error) *cobra.Command {

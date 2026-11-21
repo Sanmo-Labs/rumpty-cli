@@ -64,5 +64,5 @@ func TestStop_alreadyStopped(t *testing.T) {
 	}
 
 	require.NoError(t, vm.Stop(context.Background(), rt, "test-vm7"))
-	assert.Contains(t, errOut.String(), "Stopped test-vm7")
+	assert.Contains(t, errOut.String(), "test-vm7 is already stopped")
 }

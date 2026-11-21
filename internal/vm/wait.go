@@ -16,13 +16,13 @@ const (
 	lifecyclePollTimeout  = 10 * time.Minute
 )
 
-func WaitForLifecycle(ctx context.Context, rt *app.Runtime, target *api.VM, action, operationID string) error {
+// WaitForLifecycle polls until the action has taken effect, showing progress
+// on spin.
+func WaitForLifecycle(ctx context.Context, rt *app.Runtime, target *api.VM, action, operationID string, spin *term.Spinner) error {
 	if lifecycleReached(ctx, rt, target.Slug, action) {
 		return nil
 	}
-
-	spin := term.StartSpinner(out(rt), waitLabel(action, target.Slug))
-	defer spin.Stop()
+	spin.Update(waitLabel(action, target.Slug))
 
 	deadline := time.Now().Add(lifecyclePollTimeout)
 	ticker := time.NewTicker(lifecyclePollInterval)
@@ -108,6 +108,21 @@ func waitLabel(action, slug string) string {
 		return fmt.Sprintf("Waiting for %s to be deleted", slug)
 	default:
 		return fmt.Sprintf("Waiting for %s", slug)
+	}
+}
+
+func actionLabel(action, slug string) string {
+	switch action {
+	case "start":
+		return "Starting " + slug
+	case "stop":
+		return "Stopping " + slug
+	case "reboot":
+		return "Rebooting " + slug
+	case "delete":
+		return "Deleting " + slug
+	default:
+		return fmt.Sprintf("Running %s on %s", action, slug)
 	}
 }
 
