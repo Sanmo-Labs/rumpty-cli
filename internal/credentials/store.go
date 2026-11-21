@@ -42,6 +42,7 @@ func Load() (File, error) {
 		return File{}, err
 	}
 
+	RestrictPermissions(path)
 	data, err := os.ReadFile(path)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
@@ -62,18 +63,13 @@ func Save(creds File) error {
 	if err != nil {
 		return err
 	}
-	if err := os.MkdirAll(dir, 0o700); err != nil {
-		return fmt.Errorf("create config directory: %w", err)
-	}
-
 	data, err := json.MarshalIndent(creds, "", "  ")
 	if err != nil {
 		return err
 	}
 	data = append(data, '\n')
 
-	path := filepath.Join(dir, fileName)
-	if err := os.WriteFile(path, data, 0o600); err != nil {
+	if err := WriteSecretFile(filepath.Join(dir, fileName), data); err != nil {
 		return fmt.Errorf("write credentials: %w", err)
 	}
 	return nil

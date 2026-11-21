@@ -68,14 +68,11 @@ func writeState(state *DaemonState) error {
 	if err != nil {
 		return err
 	}
-	if err := os.MkdirAll(filepath.Dir(path), 0o700); err != nil {
-		return err
-	}
 	data, err := json.MarshalIndent(state, "", "  ")
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(path, append(data, '\n'), 0o600)
+	return credentials.WriteSecretFile(path, append(data, '\n'))
 }
 
 func readState(id string) (*DaemonState, error) {
@@ -394,4 +391,14 @@ func humanAgo(t *time.Time) string {
 	default:
 		return fmt.Sprintf("%dd ago", int(d.Hours()/24))
 	}
+}
+
+// StopAllDaemons stops every running sync daemon. It does nothing when none
+// are running.
+func StopAllDaemons(rt *app.Runtime) error {
+	states, err := listStates()
+	if err != nil || len(states) == 0 {
+		return err
+	}
+	return StopDaemons(rt, "", true)
 }

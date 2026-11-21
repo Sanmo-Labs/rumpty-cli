@@ -77,6 +77,15 @@ func (c *Client) CreateAssetBucket(ctx context.Context, workspace string, req Cr
 	return data, err
 }
 
+func (c *Client) RevokeAssetAccessKey(ctx context.Context, workspace, keyUID string) error {
+	path := "/v1/asset-bucket-access-keys/" + url.PathEscape(keyUID)
+	return c.deleteWithOptions(ctx, path, nil, requestOptions{
+		headers: map[string]string{
+			headerWorkspaceSlug: workspace,
+		},
+	})
+}
+
 func (c *Client) CreateAssetAccessKey(ctx context.Context, workspace, bucketUID string, req CreateAssetAccessKeyRequest) (CreateAssetAccessKeyResult, error) {
 	var data CreateAssetAccessKeyResult
 	path := "/v1/asset-buckets/" + url.PathEscape(bucketUID) + "/access-keys"

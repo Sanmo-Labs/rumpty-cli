@@ -130,6 +130,8 @@ func mintBucketKey(ctx context.Context, rt *app.Runtime, workspace string, bucke
 		return BucketKey{}, err
 	}
 	key := BucketKey{
+		UID:             result.UID,
+		Workspace:       workspace,
 		AccessKeyID:     result.AccessKeyID,
 		SecretAccessKey: result.SecretAccessKey,
 		Endpoint:        result.Endpoint,

@@ -35,7 +35,7 @@ func NewRoot(rt *app.Runtime) *cobra.Command {
 		&rt.Config.Token,
 		"token",
 		"",
-		fmt.Sprintf("Rumpty API key; $%s", config.EnvToken),
+		fmt.Sprintf("Rumpty API key (visible in shell history; prefer $%s)", config.EnvToken),
 	)
 	cmd.PersistentFlags().StringVar(
 		&rt.Config.Workspace,
