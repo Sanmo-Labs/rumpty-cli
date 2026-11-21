@@ -12,7 +12,7 @@ import (
 var (
 	boldStyle  = lipgloss.NewStyle().Bold(true)
 	mutedStyle = lipgloss.NewStyle().Faint(true)
-	linkStyle  = lipgloss.NewStyle().Bold(true).Underline(true).Foreground(lipgloss.Color("14"))
+	linkStyle  = lipgloss.NewStyle().Underline(true).Foreground(skyBlue)
 	errorStyle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("1"))
 )
 

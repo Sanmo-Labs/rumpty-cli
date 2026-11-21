@@ -35,7 +35,7 @@ func TestList_printsWorkspaces(t *testing.T) {
 		APIClient: mock,
 	}
 
-	require.NoError(t, workspace.List(context.Background(), rt))
+	require.NoError(t, workspace.List(context.Background(), rt, term.OutputTable))
 	s := out.String()
 	assert.Contains(t, s, "SLUG")
 	assert.Contains(t, s, "NAME")
@@ -57,6 +57,6 @@ func TestList_empty(t *testing.T) {
 		APIClient: mock,
 	}
 
-	require.NoError(t, workspace.List(context.Background(), rt))
+	require.NoError(t, workspace.List(context.Background(), rt, term.OutputTable))
 	assert.Contains(t, strings.TrimSpace(out.String()), "No workspaces.")
 }

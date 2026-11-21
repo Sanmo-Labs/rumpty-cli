@@ -9,18 +9,28 @@ import (
 )
 
 func newWorkspacesCmd(rt *app.Runtime) *cobra.Command {
-	return &cobra.Command{
-		Use:   "workspaces",
-		Short: "List workspaces you can access",
-		Long:  "List Rumpty workspaces for the authenticated user.",
+	var output string
+	cmd := &cobra.Command{
+		Use:     "workspaces",
+		Aliases: []string{"ws", "workspace"},
+		Short:   "List workspaces you can access",
+		Long:    "List Rumpty workspaces for the authenticated user.",
 		Example: `  rumpty login
-  rumpty workspaces`,
+  rumpty workspaces
+  rumpty ws
+  rumpty ws -o json`,
 		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			format, err := outputFormat(output)
+			if err != nil {
+				return err
+			}
 			if err := rt.Config.ValidateForAuth(); err != nil {
 				return config.NewUsageError("%v", err)
 			}
-			return workspace.List(cmd.Context(), rt)
+			return workspace.List(cmd.Context(), rt, format)
 		},
 	}
+	addOutputFlag(cmd, &output)
+	return cmd
 }

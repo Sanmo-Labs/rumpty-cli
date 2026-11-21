@@ -61,7 +61,22 @@ func buildSSHArgs(proxyCommand string, session *api.CertResponse, opts *Options)
 	remote := session.Username + "@" + session.VMSlug
 	args = append(args, "--", remote)
 	if opts != nil && len(opts.Command) > 0 {
-		args = append(args, opts.Command...)
+		args = append(args, remoteCommand(opts.Command))
 	}
 	return args
+}
+
+// remoteCommand builds the command string ssh hands to the VM's shell. A
+// single argument is used as written, so `rumpty exec vm -- 'ls | wc -l'`
+// keeps working as a shell command line. Several arguments are quoted one by
+// one, so each reaches the remote program exactly as typed.
+func remoteCommand(command []string) string {
+	if len(command) == 1 {
+		return command[0]
+	}
+	quoted := make([]string, len(command))
+	for i, arg := range command {
+		quoted[i] = posixQuote(arg)
+	}
+	return strings.Join(quoted, " ")
 }

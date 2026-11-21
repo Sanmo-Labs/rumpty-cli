@@ -68,19 +68,19 @@ func Exec(ctx context.Context, rt *app.Runtime, ref string, command []string, op
 }
 
 func connect(ctx context.Context, rt *app.Runtime, vmRef string, opts *Options) error {
+	var spin *term.Spinner
 	if opts == nil || !opts.Debug {
-		term.Statusf(stderr(rt), "%s", prepareStatus(vmRef, opts))
+		spin = term.StartSpinner(stderr(rt), prepareStatus(vmRef, opts))
 	}
+	defer stopSpinner(spin)
 
 	key, session, err := obtainSession(ctx, rt, vmRef, opts)
 	if err != nil {
 		return err
 	}
 	rumptylog.Debug("connecting with ssh", "host", session.EdgeHost, "port", session.EdgePort, "router_user", session.RouterUser)
-	if opts == nil || !opts.Debug {
-		term.Statusf(stderr(rt), "%s", openStatus(session.Username, opts))
-	}
-	return Dial(ctx, &session, key, opts, nil)
+	spin.Update(openStatus(session.Username, opts))
+	return Dial(ctx, &session, key, opts, spin)
 }
 
 func prepareStatus(vmRef string, opts *Options) string {
@@ -199,6 +199,7 @@ func Dial(ctx context.Context, session *api.CertResponse, key KeyPair, opts *Opt
 
 	if err := cmd.Run(); err != nil {
 		printHostKeyMismatchHint(errTail.String(), session.VMSlug)
+		printPublicKeyHint(errTail.String(), session, opts)
 		return wrapRunErr(err)
 	}
 	return nil
@@ -234,6 +235,19 @@ func printHostKeyMismatchHint(sshStderr, vmSlug string) {
 			"If this VM was rebuilt or recreated, that is expected. Remove the stale entry and retry:\n\n"+
 			"  ssh-keygen -R %s -f %s\n\n",
 		vmSlug, vmSlug, path)
+}
+
+func printPublicKeyHint(sshStderr string, session *api.CertResponse, opts *Options) {
+	if !strings.Contains(sshStderr, session.VMSlug+": Permission denied (publickey)") {
+		return
+	}
+	hint := "\nThe VM didn't accept any of your SSH keys. Keys are added to a VM when it is created,\n" +
+		"so pass the private key that matches one of them with -i ~/.ssh/<key>.\n"
+	if opts != nil && strings.TrimSpace(opts.IdentityFile) != "" {
+		hint = "\nThe VM didn't accept the key from -i " + opts.IdentityFile + ". Keys are added to a VM when it is created;\n" +
+			"check that this key was one of them.\n"
+	}
+	fmt.Fprintln(os.Stderr, term.Muted(os.Stderr, hint)) //nolint:gosec // terminal output, not HTML
 }
 
 func wrapRunErr(err error) error {

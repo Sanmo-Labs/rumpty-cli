@@ -144,15 +144,23 @@ inspect it with "rumpty sync status" and end it with "rumpty sync stop".`,
 }
 
 func newSyncStatusCmd(rt *app.Runtime) *cobra.Command {
-	return &cobra.Command{
-		Use:     "status",
-		Short:   "Show running sync daemons",
-		Example: `  rumpty sync status`,
-		Args:    cobra.NoArgs,
+	var output string
+	cmd := &cobra.Command{
+		Use:   "status",
+		Short: "Show running sync daemons",
+		Example: `  rumpty sync status
+  rumpty sync status -o json`,
+		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return sync.StatusDaemons(rt)
+			format, err := outputFormat(output)
+			if err != nil {
+				return err
+			}
+			return sync.StatusDaemons(rt, format)
 		},
 	}
+	addOutputFlag(cmd, &output)
+	return cmd
 }
 
 func newSyncStopCmd(rt *app.Runtime) *cobra.Command {

@@ -4,15 +4,15 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"text/tabwriter"
 
 	"github.com/Sanmo-Labs/rumpty-cli/internal/api"
 	"github.com/Sanmo-Labs/rumpty-cli/internal/app"
 	"github.com/Sanmo-Labs/rumpty-cli/internal/term"
 )
 
-func ListApps(ctx context.Context, rt *app.Runtime, ref string) error {
-	term.Statusf(out(rt), "Resolving VM %s", ref)
+func ListApps(ctx context.Context, rt *app.Runtime, ref string, format term.OutputFormat) error {
+	spin := term.StartLoading(out(rt), "Loading exposed apps for "+ref)
+	defer spin.Stop()
 	target, err := Find(ctx, rt, ref)
 	if err != nil {
 		return err
@@ -23,23 +23,32 @@ func ListApps(ctx context.Context, rt *app.Runtime, ref string) error {
 	if err != nil {
 		return fmt.Errorf("list exposed apps for %s: %w", target.Slug, err)
 	}
+	spin.Stop()
+	w := rt.Streams.Out
+	if format == term.OutputJSON {
+		return term.WriteJSON(w, apps)
+	}
 	if len(apps) == 0 {
-		fmt.Fprintf(rt.Streams.Out, "No exposed apps for %s.\n", target.Slug)
+		fmt.Fprintf(w, "No exposed apps for %s.\n", target.Slug)
+		fmt.Fprintln(w, term.Muted(w, fmt.Sprintf("Expose one with: rumpty expose %s --ws %s --port <port>", target.Slug, workspace)))
 		return nil
 	}
 
-	tw := tabwriter.NewWriter(rt.Streams.Out, 0, 0, 2, ' ', 0)
-	fmt.Fprintln(tw, "NAME\tPORT\tPROTOCOL\tSTATUS\tURL")
+	table := term.NewTable(w, "NAME", "PORT", "PROTOCOL", "STATUS", "URL")
 	for i := range apps {
-		fmt.Fprintf(tw, "%s\t%d\t%s\t%s\t%s\n",
-			appName(&apps[i]),
-			apps[i].Port,
+		table.Row(
+			term.Bold(w, appName(&apps[i])),
+			fmt.Sprintf("%d", apps[i].Port),
 			appProtocol(&apps[i]),
-			appStatus(&apps[i]),
-			appURL(&apps[i]),
+			term.StatusBadge(w, appStatus(&apps[i])),
+			term.Link(w, appURL(&apps[i])),
 		)
 	}
-	return tw.Flush()
+	if err := table.Render(); err != nil {
+		return err
+	}
+	term.Summary(w, plural(len(apps), "exposed app", "exposed apps"))
+	return nil
 }
 
 func appName(app *api.VMApp) string {

@@ -3,25 +3,38 @@ package workspace
 import (
 	"context"
 	"fmt"
-	"text/tabwriter"
 
 	"github.com/Sanmo-Labs/rumpty-cli/internal/app"
+	"github.com/Sanmo-Labs/rumpty-cli/internal/term"
 )
 
-func List(ctx context.Context, rt *app.Runtime) error {
+func List(ctx context.Context, rt *app.Runtime, format term.OutputFormat) error {
+	spin := term.StartLoading(rt.Streams.ErrOut, "Loading workspaces")
 	workspaces, err := rt.API().ListWorkspaces(ctx)
+	spin.Stop()
 	if err != nil {
 		return err
 	}
+	w := rt.Streams.Out
+	if format == term.OutputJSON {
+		return term.WriteJSON(w, workspaces)
+	}
 	if len(workspaces) == 0 {
-		fmt.Fprintln(rt.Streams.Out, "No workspaces.")
+		fmt.Fprintln(w, "No workspaces.")
 		return nil
 	}
 
-	tw := tabwriter.NewWriter(rt.Streams.Out, 0, 0, 2, ' ', 0)
-	fmt.Fprintln(tw, "SLUG\tNAME")
+	table := term.NewTable(w, "SLUG", "NAME")
 	for _, ws := range workspaces {
-		fmt.Fprintf(tw, "%s\t%s\n", ws.Slug, ws.Name)
+		table.Row(term.Bold(w, ws.Slug), ws.Name)
 	}
-	return tw.Flush()
+	if err := table.Render(); err != nil {
+		return err
+	}
+	if len(workspaces) == 1 {
+		term.Summary(w, "1 workspace")
+	} else {
+		term.Summary(w, fmt.Sprintf("%d workspaces", len(workspaces)), "use one with --ws <slug>")
+	}
+	return nil
 }
