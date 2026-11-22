@@ -61,8 +61,6 @@ func isLoopback(host string) bool {
 	return ip != nil && ip.IsLoopback()
 }
 
-// UserAgent names the CLI in login alerts and server logs instead of the
-// HTTP library.
 func UserAgent() string {
 	return fmt.Sprintf("rumpty-cli/%s (%s; %s)", version.Version, runtime.GOOS, runtime.GOARCH)
 }
