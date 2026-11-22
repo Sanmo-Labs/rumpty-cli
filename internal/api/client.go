@@ -6,12 +6,14 @@ import (
 	"fmt"
 	"net"
 	"net/url"
+	"runtime"
 	"strings"
 	"time"
 
 	"github.com/go-resty/resty/v2"
 
 	rumptylog "github.com/cloverworks-hq/rumpty-cli/internal/log"
+	"github.com/cloverworks-hq/rumpty-cli/internal/version"
 )
 
 type Client struct {
@@ -23,7 +25,8 @@ func NewClient(baseURL, token string) *Client {
 	r := resty.New().
 		SetBaseURL(strings.TrimRight(baseURL, "/")).
 		SetTimeout(30*time.Second).
-		SetHeader("Content-Type", "application/json")
+		SetHeader("Content-Type", "application/json").
+		SetHeader("User-Agent", UserAgent())
 	if token != "" {
 		r.SetAuthScheme("Bearer").SetAuthToken(token)
 	}
@@ -56,6 +59,12 @@ func isLoopback(host string) bool {
 	}
 	ip := net.ParseIP(host)
 	return ip != nil && ip.IsLoopback()
+}
+
+// UserAgent names the CLI in login alerts and server logs instead of the
+// HTTP library.
+func UserAgent() string {
+	return fmt.Sprintf("rumpty-cli/%s (%s; %s)", version.Version, runtime.GOOS, runtime.GOARCH)
 }
 
 type envelope struct {
