@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/Sanmo-Labs/rumpty-cli/internal/api"
+	"github.com/cloverworks-hq/rumpty-cli/internal/api"
 )
 
 func TestUserMessage_apiError(t *testing.T) {

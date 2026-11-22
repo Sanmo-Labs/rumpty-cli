@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/Sanmo-Labs/rumpty-cli/internal/credentials"
+	"github.com/cloverworks-hq/rumpty-cli/internal/credentials"
 )
 
 func TestDir_usesXDGConfigHome(t *testing.T) {

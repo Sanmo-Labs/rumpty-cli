@@ -10,9 +10,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Sanmo-Labs/rumpty-cli/internal/api"
-	"github.com/Sanmo-Labs/rumpty-cli/internal/credentials"
-	rumptylog "github.com/Sanmo-Labs/rumpty-cli/internal/log"
+	"github.com/cloverworks-hq/rumpty-cli/internal/api"
+	"github.com/cloverworks-hq/rumpty-cli/internal/credentials"
+	rumptylog "github.com/cloverworks-hq/rumpty-cli/internal/log"
 )
 
 const certReuseSkew = 30 * time.Second

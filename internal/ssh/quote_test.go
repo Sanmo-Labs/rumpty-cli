@@ -11,8 +11,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/Sanmo-Labs/rumpty-cli/internal/api"
-	rumptyssh "github.com/Sanmo-Labs/rumpty-cli/internal/ssh"
+	"github.com/cloverworks-hq/rumpty-cli/internal/api"
+	rumptyssh "github.com/cloverworks-hq/rumpty-cli/internal/ssh"
 )
 
 var hostileStrings = []string{

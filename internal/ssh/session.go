@@ -15,10 +15,10 @@ import (
 
 	"golang.org/x/crypto/ssh"
 
-	"github.com/Sanmo-Labs/rumpty-cli/internal/api"
-	"github.com/Sanmo-Labs/rumpty-cli/internal/app"
-	rumptylog "github.com/Sanmo-Labs/rumpty-cli/internal/log"
-	"github.com/Sanmo-Labs/rumpty-cli/internal/term"
+	"github.com/cloverworks-hq/rumpty-cli/internal/api"
+	"github.com/cloverworks-hq/rumpty-cli/internal/app"
+	rumptylog "github.com/cloverworks-hq/rumpty-cli/internal/log"
+	"github.com/cloverworks-hq/rumpty-cli/internal/term"
 )
 
 type ExitError struct {

@@ -30,15 +30,15 @@ rumpty --version
 
 ### Verify a release
 
-Releases from v0.0.8 on are signed by this repository's release workflow and come with build provenance and an SBOM for each archive. To check a download by hand, fetch the archive, `rumpty-cli_<version>_checksums.txt` and `rumpty-cli_<version>_checksums.txt.sigstore.json` from the [release page](https://github.com/Sanmo-Labs/rumpty-cli/releases), then:
+Releases from v0.0.8 on are signed by this repository's release workflow and come with build provenance and an SBOM for each archive. To check a download by hand, fetch the archive, `rumpty-cli_<version>_checksums.txt` and `rumpty-cli_<version>_checksums.txt.sigstore.json` from the [release page](https://github.com/cloverworks-hq/rumpty-cli/releases), then:
 
 ```sh
-VERSION=0.0.8
+VERSION=0.0.12
 
 # 1. The checksums file was signed by the release workflow for this tag
 cosign verify-blob \
   --bundle "rumpty-cli_${VERSION}_checksums.txt.sigstore.json" \
-  --certificate-identity "https://github.com/Sanmo-Labs/rumpty-cli/.github/workflows/release.yml@refs/tags/v${VERSION}" \
+  --certificate-identity "https://github.com/cloverworks-hq/rumpty-cli/.github/workflows/release.yml@refs/tags/v${VERSION}" \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
   "rumpty-cli_${VERSION}_checksums.txt"
 
@@ -49,8 +49,10 @@ sha256sum --ignore-missing -c "rumpty-cli_${VERSION}_checksums.txt"   # macOS: s
 Or check where an archive was built with the GitHub CLI:
 
 ```sh
-gh attestation verify "rumpty-cli_${VERSION}_darwin_arm64.tar.gz" --repo Sanmo-Labs/rumpty-cli
+gh attestation verify "rumpty-cli_${VERSION}_darwin_arm64.tar.gz" --repo cloverworks-hq/rumpty-cli
 ```
+
+Releases v0.0.8 to v0.0.11 were signed before the organisation was renamed, so use `Sanmo-Labs/rumpty-cli` in the certificate identity for those.
 
 Each archive's SBOM is published next to it as `<archive>.sbom.json` (SPDX).
 

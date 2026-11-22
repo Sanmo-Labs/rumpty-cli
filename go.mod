@@ -1,4 +1,4 @@
-module github.com/Sanmo-Labs/rumpty-cli
+module github.com/cloverworks-hq/rumpty-cli
 
 go 1.26.11
 

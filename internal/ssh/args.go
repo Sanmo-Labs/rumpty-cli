@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Sanmo-Labs/rumpty-cli/internal/api"
+	"github.com/cloverworks-hq/rumpty-cli/internal/api"
 )
 
 // buildProxyCommand returns the inner ssh invocation used as ProxyCommand for the edge hop.

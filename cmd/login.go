@@ -9,10 +9,10 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 
-	"github.com/Sanmo-Labs/rumpty-cli/internal/app"
-	"github.com/Sanmo-Labs/rumpty-cli/internal/auth"
-	"github.com/Sanmo-Labs/rumpty-cli/internal/config"
-	rumptyterm "github.com/Sanmo-Labs/rumpty-cli/internal/term"
+	"github.com/cloverworks-hq/rumpty-cli/internal/app"
+	"github.com/cloverworks-hq/rumpty-cli/internal/auth"
+	"github.com/cloverworks-hq/rumpty-cli/internal/config"
+	rumptyterm "github.com/cloverworks-hq/rumpty-cli/internal/term"
 )
 
 func newLoginCmd(rt *app.Runtime) *cobra.Command {

@@ -1,6 +1,6 @@
 package ssh
 
-import "github.com/Sanmo-Labs/rumpty-cli/internal/api"
+import "github.com/cloverworks-hq/rumpty-cli/internal/api"
 
 func BuildSSHArgsForTest(proxyCommand string, session *api.CertResponse, opts *Options) []string {
 	return buildSSHArgs(proxyCommand, session, opts)

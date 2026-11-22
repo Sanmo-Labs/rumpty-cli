@@ -11,8 +11,8 @@ import (
 	"github.com/minio/minio-go/v7"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/Sanmo-Labs/rumpty-cli/internal/app"
-	"github.com/Sanmo-Labs/rumpty-cli/internal/term"
+	"github.com/cloverworks-hq/rumpty-cli/internal/app"
+	"github.com/cloverworks-hq/rumpty-cli/internal/term"
 )
 
 const transferWorkers = 8

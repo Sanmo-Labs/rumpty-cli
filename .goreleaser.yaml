@@ -21,10 +21,10 @@ builds:
       - arm64
     ldflags:
       - -s -w
-      - -X github.com/Sanmo-Labs/rumpty-cli/internal/version.Version={{ .Version }}
-      - -X github.com/Sanmo-Labs/rumpty-cli/internal/version.Commit={{ .Commit }}
-      - -X github.com/Sanmo-Labs/rumpty-cli/internal/config.DefaultAPIURL=https://api.rumptycloud.com
-      - -X github.com/Sanmo-Labs/rumpty-cli/internal/version.Date={{ .Date }}
+      - -X github.com/cloverworks-hq/rumpty-cli/internal/version.Version={{ .Version }}
+      - -X github.com/cloverworks-hq/rumpty-cli/internal/version.Commit={{ .Commit }}
+      - -X github.com/cloverworks-hq/rumpty-cli/internal/config.DefaultAPIURL=https://api.rumptycloud.com
+      - -X github.com/cloverworks-hq/rumpty-cli/internal/version.Date={{ .Date }}
 
 archives:
   - id: rumpty
@@ -66,7 +66,7 @@ changelog:
 
 release:
   github:
-    owner: Sanmo-Labs
+    owner: cloverworks-hq
     name: rumpty-cli
   draft: false
   prerelease: auto

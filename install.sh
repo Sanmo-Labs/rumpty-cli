@@ -13,7 +13,7 @@
 #                       Point at your own bucket/CDN mirror to avoid GitHub.
 set -eu
 
-REPO="Sanmo-Labs/rumpty-cli"
+REPO="cloverworks-hq/rumpty-cli"
 BIN="rumpty"
 BASE_URL="${RUMPTY_BASE_URL:-https://github.com/${REPO}/releases/download}"
 INSTALL_DIR="${RUMPTY_INSTALL_DIR:-/usr/local/bin}"
@@ -95,10 +95,13 @@ if dlo "$TMP/checksums.txt" "$SUMS_URL" 2>/dev/null; then
       error "checksum verification failed"
     fi
     if command -v cosign >/dev/null 2>&1; then
+      SIGNER="$REPO"
+      # Releases before the organisation rename were signed as Sanmo-Labs.
+      case "$TAG" in v0.0.8|v0.0.9|v0.0.10|v0.0.11) SIGNER="Sanmo-Labs/rumpty-cli" ;; esac
       if dlo "$TMP/checksums.txt.sigstore.json" "${SUMS_URL}.sigstore.json" 2>/dev/null; then
         if cosign verify-blob \
           --bundle "$TMP/checksums.txt.sigstore.json" \
-          --certificate-identity "https://github.com/${REPO}/.github/workflows/release.yml@refs/tags/${TAG}" \
+          --certificate-identity "https://github.com/${SIGNER}/.github/workflows/release.yml@refs/tags/${TAG}" \
           --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
           "$TMP/checksums.txt" >/dev/null 2>&1; then
           info "Signature OK"

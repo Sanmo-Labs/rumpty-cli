@@ -1,10 +1,10 @@
 package commands
 
 import (
-	"github.com/Sanmo-Labs/rumpty-cli/internal/app"
-	"github.com/Sanmo-Labs/rumpty-cli/internal/config"
-	"github.com/Sanmo-Labs/rumpty-cli/internal/term"
-	"github.com/Sanmo-Labs/rumpty-cli/pkg/cmdutil"
+	"github.com/cloverworks-hq/rumpty-cli/internal/app"
+	"github.com/cloverworks-hq/rumpty-cli/internal/config"
+	"github.com/cloverworks-hq/rumpty-cli/internal/term"
+	"github.com/cloverworks-hq/rumpty-cli/pkg/cmdutil"
 )
 
 func Execute() {

@@ -11,7 +11,7 @@ import (
 
 	"github.com/go-resty/resty/v2"
 
-	rumptylog "github.com/Sanmo-Labs/rumpty-cli/internal/log"
+	rumptylog "github.com/cloverworks-hq/rumpty-cli/internal/log"
 )
 
 type Client struct {

@@ -75,7 +75,7 @@ formatters:
       sections:
         - standard
         - default
-        - prefix(github.com/Sanmo-Labs)
+        - prefix(github.com/cloverworks-hq)
         - blank
         - dot
       custom-order: true

@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	rumptyssh "github.com/Sanmo-Labs/rumpty-cli/internal/ssh"
+	rumptyssh "github.com/cloverworks-hq/rumpty-cli/internal/ssh"
 )
 
 func TestKnownHostsFile(t *testing.T) {

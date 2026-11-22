@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	rumptyssh "github.com/Sanmo-Labs/rumpty-cli/internal/ssh"
+	rumptyssh "github.com/cloverworks-hq/rumpty-cli/internal/ssh"
 )
 
 func TestNeedsListLookup(t *testing.T) {

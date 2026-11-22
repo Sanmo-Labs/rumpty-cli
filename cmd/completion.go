@@ -7,7 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Sanmo-Labs/rumpty-cli/internal/app"
+	"github.com/cloverworks-hq/rumpty-cli/internal/app"
 )
 
 const completionTimeout = 5 * time.Second
