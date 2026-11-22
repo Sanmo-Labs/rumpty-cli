@@ -6,8 +6,8 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/Sanmo-Labs/rumpty-cli/internal/app"
-	"github.com/Sanmo-Labs/rumpty-cli/internal/vm"
+	"github.com/cloverworks-hq/rumpty-cli/internal/app"
+	"github.com/cloverworks-hq/rumpty-cli/internal/vm"
 )
 
 func resolveVMRef(ctx context.Context, rt *app.Runtime, ref string) (string, error) {

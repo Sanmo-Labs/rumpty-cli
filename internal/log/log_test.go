@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/Sanmo-Labs/rumpty-cli/internal/log"
+	"github.com/cloverworks-hq/rumpty-cli/internal/log"
 )
 
 func TestParseLevel(t *testing.T) {

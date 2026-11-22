@@ -3,8 +3,8 @@ package commands
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/Sanmo-Labs/rumpty-cli/internal/app"
-	"github.com/Sanmo-Labs/rumpty-cli/internal/auth"
+	"github.com/cloverworks-hq/rumpty-cli/internal/app"
+	"github.com/cloverworks-hq/rumpty-cli/internal/auth"
 )
 
 func newLogoutCmd(rt *app.Runtime) *cobra.Command {

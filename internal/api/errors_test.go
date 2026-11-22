@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/Sanmo-Labs/rumpty-cli/internal/api"
+	"github.com/cloverworks-hq/rumpty-cli/internal/api"
 )
 
 func TestError_Error(t *testing.T) {

@@ -6,8 +6,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/Sanmo-Labs/rumpty-cli/internal/config"
-	"github.com/Sanmo-Labs/rumpty-cli/internal/credentials"
+	"github.com/cloverworks-hq/rumpty-cli/internal/config"
+	"github.com/cloverworks-hq/rumpty-cli/internal/credentials"
 )
 
 func TestConfig_LogLevelValue(t *testing.T) {

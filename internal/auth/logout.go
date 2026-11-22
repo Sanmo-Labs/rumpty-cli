@@ -7,13 +7,13 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Sanmo-Labs/rumpty-cli/internal/api"
-	"github.com/Sanmo-Labs/rumpty-cli/internal/app"
-	"github.com/Sanmo-Labs/rumpty-cli/internal/config"
-	"github.com/Sanmo-Labs/rumpty-cli/internal/credentials"
-	rumptylog "github.com/Sanmo-Labs/rumpty-cli/internal/log"
-	rumptyssh "github.com/Sanmo-Labs/rumpty-cli/internal/ssh"
-	rumptysync "github.com/Sanmo-Labs/rumpty-cli/internal/sync"
+	"github.com/cloverworks-hq/rumpty-cli/internal/api"
+	"github.com/cloverworks-hq/rumpty-cli/internal/app"
+	"github.com/cloverworks-hq/rumpty-cli/internal/config"
+	"github.com/cloverworks-hq/rumpty-cli/internal/credentials"
+	rumptylog "github.com/cloverworks-hq/rumpty-cli/internal/log"
+	rumptyssh "github.com/cloverworks-hq/rumpty-cli/internal/ssh"
+	rumptysync "github.com/cloverworks-hq/rumpty-cli/internal/sync"
 )
 
 // Logout stops sync daemons, revokes the bucket access keys sync created,

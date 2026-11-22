@@ -10,11 +10,11 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 
-	"github.com/Sanmo-Labs/rumpty-cli/internal/api"
-	"github.com/Sanmo-Labs/rumpty-cli/internal/api/mocks"
-	"github.com/Sanmo-Labs/rumpty-cli/internal/auth"
-	"github.com/Sanmo-Labs/rumpty-cli/internal/config"
-	"github.com/Sanmo-Labs/rumpty-cli/internal/credentials"
+	"github.com/cloverworks-hq/rumpty-cli/internal/api"
+	"github.com/cloverworks-hq/rumpty-cli/internal/api/mocks"
+	"github.com/cloverworks-hq/rumpty-cli/internal/auth"
+	"github.com/cloverworks-hq/rumpty-cli/internal/config"
+	"github.com/cloverworks-hq/rumpty-cli/internal/credentials"
 )
 
 func TestLogout_clearsCredentials(t *testing.T) {

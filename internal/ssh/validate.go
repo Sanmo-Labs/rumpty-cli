@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/Sanmo-Labs/rumpty-cli/internal/api"
+	"github.com/cloverworks-hq/rumpty-cli/internal/api"
 )
 
 var (

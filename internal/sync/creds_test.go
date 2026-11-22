@@ -10,8 +10,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 
-	"github.com/Sanmo-Labs/rumpty-cli/internal/api/mocks"
-	"github.com/Sanmo-Labs/rumpty-cli/internal/credentials"
+	"github.com/cloverworks-hq/rumpty-cli/internal/api/mocks"
+	"github.com/cloverworks-hq/rumpty-cli/internal/credentials"
 )
 
 func TestRevokeSavedKeys(t *testing.T) {

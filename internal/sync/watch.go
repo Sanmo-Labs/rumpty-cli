@@ -10,8 +10,8 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 
-	"github.com/Sanmo-Labs/rumpty-cli/internal/app"
-	"github.com/Sanmo-Labs/rumpty-cli/internal/term"
+	"github.com/cloverworks-hq/rumpty-cli/internal/app"
+	"github.com/cloverworks-hq/rumpty-cli/internal/term"
 )
 
 const watchDebounce = 2 * time.Second

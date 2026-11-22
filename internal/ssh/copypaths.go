@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Sanmo-Labs/rumpty-cli/internal/api"
+	"github.com/cloverworks-hq/rumpty-cli/internal/api"
 )
 
 // CopyPaths holds parsed local/remote paths for a copy operation.

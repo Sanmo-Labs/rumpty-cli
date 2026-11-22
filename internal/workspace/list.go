@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Sanmo-Labs/rumpty-cli/internal/app"
-	"github.com/Sanmo-Labs/rumpty-cli/internal/term"
+	"github.com/cloverworks-hq/rumpty-cli/internal/app"
+	"github.com/cloverworks-hq/rumpty-cli/internal/term"
 )
 
 func List(ctx context.Context, rt *app.Runtime, format term.OutputFormat) error {

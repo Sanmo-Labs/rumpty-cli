@@ -10,12 +10,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Sanmo-Labs/rumpty-cli/internal/api"
-	"github.com/Sanmo-Labs/rumpty-cli/internal/app"
-	"github.com/Sanmo-Labs/rumpty-cli/internal/config"
-	"github.com/Sanmo-Labs/rumpty-cli/internal/credentials"
-	rumptylog "github.com/Sanmo-Labs/rumpty-cli/internal/log"
-	"github.com/Sanmo-Labs/rumpty-cli/internal/term"
+	"github.com/cloverworks-hq/rumpty-cli/internal/api"
+	"github.com/cloverworks-hq/rumpty-cli/internal/app"
+	"github.com/cloverworks-hq/rumpty-cli/internal/config"
+	"github.com/cloverworks-hq/rumpty-cli/internal/credentials"
+	rumptylog "github.com/cloverworks-hq/rumpty-cli/internal/log"
+	"github.com/cloverworks-hq/rumpty-cli/internal/term"
 )
 
 const errLoginTimedOut = "login timed out: run rumpty login again"

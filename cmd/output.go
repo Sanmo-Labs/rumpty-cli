@@ -3,8 +3,8 @@ package commands
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/Sanmo-Labs/rumpty-cli/internal/config"
-	"github.com/Sanmo-Labs/rumpty-cli/internal/term"
+	"github.com/cloverworks-hq/rumpty-cli/internal/config"
+	"github.com/cloverworks-hq/rumpty-cli/internal/term"
 )
 
 func addOutputFlag(cmd *cobra.Command, value *string) {

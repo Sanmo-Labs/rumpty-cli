@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/Sanmo-Labs/rumpty-cli/internal/term"
+	"github.com/cloverworks-hq/rumpty-cli/internal/term"
 )
 
 func TestBold_noEscapeWhenNotTerminal(t *testing.T) {

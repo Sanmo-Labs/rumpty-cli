@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Sanmo-Labs/rumpty-cli/internal/credentials"
+	"github.com/cloverworks-hq/rumpty-cli/internal/credentials"
 )
 
 const (

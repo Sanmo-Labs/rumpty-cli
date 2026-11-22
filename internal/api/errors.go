@@ -7,7 +7,7 @@ import (
 	"net"
 	"strings"
 
-	rumptylog "github.com/Sanmo-Labs/rumpty-cli/internal/log"
+	rumptylog "github.com/cloverworks-hq/rumpty-cli/internal/log"
 )
 
 type Error struct {

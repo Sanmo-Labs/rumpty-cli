@@ -6,11 +6,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Sanmo-Labs/rumpty-cli/internal/app"
-	"github.com/Sanmo-Labs/rumpty-cli/internal/config"
-	rumptylog "github.com/Sanmo-Labs/rumpty-cli/internal/log"
-	"github.com/Sanmo-Labs/rumpty-cli/internal/term"
-	"github.com/Sanmo-Labs/rumpty-cli/internal/version"
+	"github.com/cloverworks-hq/rumpty-cli/internal/app"
+	"github.com/cloverworks-hq/rumpty-cli/internal/config"
+	rumptylog "github.com/cloverworks-hq/rumpty-cli/internal/log"
+	"github.com/cloverworks-hq/rumpty-cli/internal/term"
+	"github.com/cloverworks-hq/rumpty-cli/internal/version"
 )
 
 func NewRoot(rt *app.Runtime) *cobra.Command {
