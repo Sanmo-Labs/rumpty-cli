@@ -11,6 +11,9 @@
 #                       (falls back to $HOME/.local/bin when not writable).
 #   RUMPTY_BASE_URL     Base URL for release archives. Default: GitHub releases.
 #                       Point at your own bucket/CDN mirror to avoid GitHub.
+#   RUMPTY_SKIP_VERIFY  Set to 1 to install even when the checksum or signature
+#                       is missing. A checksum or signature that does not
+#                       match always stops the install. Not recommended.
 set -eu
 
 REPO="cloverworks-hq/rumpty-cli"
@@ -75,6 +78,14 @@ if [ -z "$TAG" ]; then
 fi
 VERSION="${TAG#v}"   # goreleaser archives drop the leading v
 
+# Releases from v0.0.8 on are signed; a missing signature for them is an error.
+version_at_least() {
+  printf '%s\n%s\n' "$2" "$1" | sort -t. -k1,1n -k2,2n -k3,3n | head -n1 | grep -qx "$2"
+}
+skip_or_fail() {
+  if [ "${RUMPTY_SKIP_VERIFY:-}" = "1" ]; then warn "$1; installing anyway (RUMPTY_SKIP_VERIFY=1)"; else error "$1; set RUMPTY_SKIP_VERIFY=1 to install anyway"; fi
+}
+
 ARCHIVE="rumpty-cli_${VERSION}_${OS}_${ARCH}.tar.gz"
 URL="${BASE_URL}/${TAG}/${ARCHIVE}"
 SUMS_URL="${BASE_URL}/${TAG}/rumpty-cli_${VERSION}_checksums.txt"
@@ -89,7 +100,13 @@ if dlo "$TMP/checksums.txt" "$SUMS_URL" 2>/dev/null; then
   if command -v sha256sum >/dev/null 2>&1; then SHA="sha256sum";
   elif command -v shasum >/dev/null 2>&1; then SHA="shasum -a 256"; else SHA=""; fi
   if [ -n "$SHA" ]; then
-    if ( cd "$TMP" && grep " ${ARCHIVE}\$" checksums.txt | $SHA -c - ) >/dev/null 2>&1; then
+    EXPECTED="$(awk -v f="$ARCHIVE" '$2 == f || $2 == "*" f { print $1 }' "$TMP/checksums.txt")"
+    ACTUAL="$($SHA "$TMP/$ARCHIVE" | awk '{ print $1 }')"
+    case "$EXPECTED" in
+      *[!0-9a-f]*|"") error "checksums for ${TAG} have no valid entry for ${ARCHIVE}" ;;
+    esac
+    [ "${#EXPECTED}" -eq 64 ] || error "checksums for ${TAG} have no valid entry for ${ARCHIVE}"
+    if [ "$EXPECTED" = "$ACTUAL" ]; then
       info "Checksum OK"
     else
       error "checksum verification failed"
@@ -108,15 +125,19 @@ if dlo "$TMP/checksums.txt" "$SUMS_URL" 2>/dev/null; then
         else
           error "signature verification failed"
         fi
+      elif version_at_least "$VERSION" 0.0.8; then
+        skip_or_fail "signature for ${TAG} is missing"
       else
         warn "no signature for ${TAG}; skipping signature verification"
       fi
+    else
+      info "Install cosign to also verify the release signature"
     fi
   else
-    warn "no sha256 tool; skipping checksum verification"
+    skip_or_fail "no sha256sum or shasum to verify the download"
   fi
 else
-  warn "checksums not found; skipping verification"
+  skip_or_fail "checksums for ${TAG} not found"
 fi
 
 # --- Extract + install ------------------------------------------------------
