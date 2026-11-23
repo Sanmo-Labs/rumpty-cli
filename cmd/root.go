@@ -87,6 +87,7 @@ func NewRoot(rt *app.Runtime) *cobra.Command {
 		newExecCmd(rt),
 		newCopyCmd(rt),
 		newSyncCmd(rt),
+		newDBCmd(rt),
 	)
 
 	defaultHelp := cmd.HelpFunc()

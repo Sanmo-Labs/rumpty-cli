@@ -26,6 +26,8 @@ type ClientAPI interface {
 	StartDevice(ctx context.Context) (DeviceAuthStartResponse, error)
 	PollDeviceToken(ctx context.Context, deviceCode string) (DeviceAuthPollResponse, error)
 	IssueSSHCert(ctx context.Context, workspace string, req CertRequest) (CertResponse, error)
+	ListDatabases(ctx context.Context, workspace string) ([]Database, error)
+	DeleteDatabase(ctx context.Context, workspace, dbUID, idempotency string) (DatabaseOperationResult, error)
 }
 
 var _ ClientAPI = (*Client)(nil)
