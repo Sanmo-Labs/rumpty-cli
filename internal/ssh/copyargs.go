@@ -14,8 +14,6 @@ func buildCopySSHOptions(proxyCommand string, opts *Options) []string {
 	args = append(args, quietSSHOptions(debug)...)
 	args = append(args, hostKeyOptions()...)
 	args = append(args,
-		"-o", "PubkeyAcceptedAlgorithms=+ssh-rsa",
-		"-o", "HostkeyAlgorithms=+ssh-rsa",
 		"-T",
 		"-o", "BatchMode=yes",
 		"-o", "RequestTTY=no",

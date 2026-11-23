@@ -37,10 +37,6 @@ func buildSSHArgs(proxyCommand string, session *api.CertResponse, opts *Options)
 	args := []string{"-o", "ProxyCommand=" + proxyCommand, "-o", "CheckHostIP=no"}
 	args = append(args, quietSSHOptions(debug)...)
 	args = append(args, hostKeyOptions()...)
-	args = append(args,
-		"-o", "PubkeyAcceptedAlgorithms=+ssh-rsa",
-		"-o", "HostkeyAlgorithms=+ssh-rsa",
-	)
 	if debug {
 		args = append(args, "-vvv")
 	}
