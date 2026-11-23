@@ -2,6 +2,8 @@
 
 Manage workspaces, VMs, and storage on [Rumpty Cloud](https://rumptycloud.com) from your terminal.
 
+![rumpty listing workspaces and VMs, starting a VM and exposing it on a public URL](docs/demo.gif)
+
 ## Install
 
 Install the latest release with the install script:
