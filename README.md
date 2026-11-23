@@ -10,7 +10,7 @@ Install the latest release with the install script:
 curl -fsSL https://get.rumptycloud.com | sh
 ```
 
-The script downloads the release for your OS and architecture, verifies its checksum, and installs the `rumpty` binary to `/usr/local/bin` (falling back to `~/.local/bin` when that directory is not writable). If [cosign](https://docs.sigstore.dev/cosign/system_config/installation/) is installed, it also verifies the release signature and stops if the check fails.
+The script downloads the release for your OS and architecture, verifies its checksum, and installs the `rumpty` binary to `/usr/local/bin` (falling back to `~/.local/bin` when that directory is not writable). It stops if the checksum is missing or does not match. If [cosign](https://docs.sigstore.dev/cosign/system_config/installation/) is installed, it also verifies the release signature and stops if the signature is missing or invalid.
 
 Optional overrides:
 
