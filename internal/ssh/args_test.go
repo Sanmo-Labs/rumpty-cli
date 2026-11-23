@@ -1,6 +1,7 @@
 package ssh_test
 
 import (
+	"os"
 	"os/exec"
 	"runtime"
 	"strings"
@@ -92,5 +93,24 @@ func TestSSHBinPath_orError(t *testing.T) {
 	_, err := rumptyssh.SSHBinPath()
 	if err != nil {
 		require.ErrorIs(t, err, rumptyssh.ErrSSHNotFound)
+	}
+}
+
+func TestSSHArgs_doNotEnableSHA1RSA(t *testing.T) {
+	t.Parallel()
+
+	session := &api.CertResponse{Username: "ubuntu", VMSlug: "my-vm"}
+	_, _, scpArgs := rumptyssh.BuildSCPArgsForTest("proxy", session, rumptyssh.CopyPaths{VMRef: "my-vm", Local: "a", Remote: "/b"}, nil, false)
+	wrapper, err := rumptyssh.WriteRsyncSSHWrapperForTest(t.TempDir(), "ssh", "proxy", nil)
+	require.NoError(t, err)
+	script, err := os.ReadFile(wrapper)
+	require.NoError(t, err)
+	assert.NotContains(t, string(script), "ssh-rsa")
+	for name, args := range map[string][]string{
+		"exec":        rumptyssh.BuildSSHArgsForTest("proxy", session, &rumptyssh.Options{Command: []string{"true"}}),
+		"interactive": rumptyssh.BuildSSHArgsForTest("proxy", session, &rumptyssh.Options{}),
+		"scp":         scpArgs,
+	} {
+		assert.NotContains(t, strings.Join(args, " "), "ssh-rsa", name)
 	}
 }
