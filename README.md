@@ -80,7 +80,7 @@ SSH into a workspace VM:
 rumpty ssh <vm>
 ```
 
-Back up a local folder to object storage — the bucket is created automatically on first run, and repeat runs only transfer changes:
+Back up a local folder to object storage, or copy one file in either direction with `bucket cp` — the bucket is created automatically on first run, and repeat sync runs only transfer changes:
 
 ```sh
 rumpty sync ~/sales-reports my-backups
@@ -100,6 +100,16 @@ Add `--watch` to keep syncing as files change, or `--daemon` to do the same in a
 | `expose` / `unexpose` | Add or remove a public URL for a VM service |
 | `vm` | Manage workspace VMs: `ls`, `start`, `stop`, `reboot`, `delete` |
 | `workspaces` | List workspaces you can access |
+| `ws invitations` | List or revoke pending workspace invitations |
+| `db rm` | Delete a managed database (asks for confirmation) |
+| `ssh-key` | Add or remove SSH public keys on your account |
+| `api-key` | Create and revoke API keys |
+| `bucket objects` | List, download or delete objects in a bucket |
+| `firewall` | Manage firewall policies, their rules and attachments |
+| `volume` | Create, delete, attach and detach volumes |
+| `k8s` | Create and delete clusters, fetch kubeconfigs |
+| `billing` | Show your invoices and download PDFs |
+| `deploy` | List and inspect deployments |
 | `completion` | Generate shell autocompletion script |
 
 Use `rumpty [command] --help` for details on any command.
