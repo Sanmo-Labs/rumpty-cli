@@ -28,6 +28,10 @@ Verify the install:
 rumpty --version
 ```
 
+### Updates
+
+Once a day, `rumpty` checks GitHub for a newer release and prints a one-line notice when it finds one. The notice only appears in a terminal, never in pipes, scripts or CI. Set `RUMPTY_NO_UPDATE_NOTIFIER=1` to turn it off.
+
 ### Verify a release
 
 Releases from v0.0.8 on are signed by this repository's release workflow and come with build provenance and an SBOM for each archive. To check a download by hand, fetch the archive, `rumpty-cli_<version>_checksums.txt` and `rumpty-cli_<version>_checksums.txt.sigstore.json` from the [release page](https://github.com/cloverworks-hq/rumpty-cli/releases), then:
