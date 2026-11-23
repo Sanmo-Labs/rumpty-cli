@@ -67,3 +67,9 @@ func ShellQuoteForTest(s string) string { return shellQuote(s) }
 func PosixQuoteForTest(s string) string { return posixQuote(s) }
 
 func ValidateSessionForTest(s *api.CertResponse) error { return validateSession(s) }
+
+func CertKeyAccountForTest(apiURL, workspace, vmSlug, guestUser string) string {
+	return certKeyAccount(apiURL, workspace, vmSlug, guestUser)
+}
+
+func CertStorePathForTest() (string, error) { return certStorePath() }
