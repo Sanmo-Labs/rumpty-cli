@@ -146,6 +146,21 @@ func (mr *MockClientAPIMockRecorder) ListAssetBuckets(ctx, workspace any) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAssetBuckets", reflect.TypeOf((*MockClientAPI)(nil).ListAssetBuckets), ctx, workspace)
 }
 
+// ListInvoices mocks base method.
+func (m *MockClientAPI) ListInvoices(ctx context.Context) ([]api.Invoice, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListInvoices", ctx)
+	ret0, _ := ret[0].([]api.Invoice)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListInvoices indicates an expected call of ListInvoices.
+func (mr *MockClientAPIMockRecorder) ListInvoices(ctx any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListInvoices", reflect.TypeOf((*MockClientAPI)(nil).ListInvoices), ctx)
+}
+
 // ListVMApps mocks base method.
 func (m *MockClientAPI) ListVMApps(ctx context.Context, workspace, vmUID string) ([]api.VMApp, error) {
 	m.ctrl.T.Helper()
