@@ -32,6 +32,10 @@ func (c *Client) Logout(ctx context.Context) error {
 	return c.post(ctx, "/v1/auth/logout", struct{}{}, nil, requestOptions{})
 }
 
+func (c *Client) LogoutAll(ctx context.Context) error {
+	return c.post(ctx, "/v1/auth/logout-all", struct{}{}, nil, requestOptions{})
+}
+
 func (c *Client) Me(ctx context.Context) (User, error) {
 	var data User
 	if err := c.get(ctx, "/v1/me", &data); err != nil {

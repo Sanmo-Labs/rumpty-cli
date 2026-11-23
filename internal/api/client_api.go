@@ -22,6 +22,7 @@ type ClientAPI interface {
 	CreateAssetAccessKey(ctx context.Context, workspace, bucketUID string, req CreateAssetAccessKeyRequest) (CreateAssetAccessKeyResult, error)
 	RevokeAssetAccessKey(ctx context.Context, workspace, keyUID string) error
 	Logout(ctx context.Context) error
+	LogoutAll(ctx context.Context) error
 	StartDevice(ctx context.Context) (DeviceAuthStartResponse, error)
 	PollDeviceToken(ctx context.Context, deviceCode string) (DeviceAuthPollResponse, error)
 	IssueSSHCert(ctx context.Context, workspace string, req CertRequest) (CertResponse, error)
