@@ -1,0 +1,37 @@
+name: Open PR limit
+
+# pull_request_target is needed for write access on PRs from forks. Safe here:
+# nothing from the PR is checked out or run; only its number and author are read.
+on:
+  pull_request_target: # zizmor: ignore[dangerous-triggers]
+    types: [opened, reopened]
+
+permissions: {}
+
+jobs:
+  limit:
+    name: At most 2 open PRs per contributor
+    if: >-
+      ${{ !contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.pull_request.author_association)
+      && !endsWith(github.event.pull_request.user.login, '[bot]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Close the PR if the author already has too many open
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+          NUMBER: ${{ github.event.pull_request.number }}
+          LIMIT: 2
+        run: |
+          open="$(gh pr list --repo "$REPO" --author "$AUTHOR" --state open --limit 100 --json number --jq 'length')"
+          echo "$AUTHOR has $open open pull requests (limit $LIMIT)"
+          if [ "$open" -le "$LIMIT" ]; then
+            exit 0
+          fi
+          gh pr close "$NUMBER" --repo "$REPO" --comment "Thanks for contributing! To keep reviews manageable, each contributor can have at most $LIMIT open pull requests at a time, and you have $((open - 1)) others open. This one has been closed; please reopen it, or open it again, once some of your other pull requests are merged or closed.
+
+          Each pull request should be based on \`master\` and contain only the change for its issue. See [CONTRIBUTING.md](https://github.com/$REPO/blob/master/CONTRIBUTING.md)."

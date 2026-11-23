@@ -85,6 +85,7 @@ git push --force-with-lease
 ## Pull requests
 
 - One change per pull request. Fill in the pull request template: a check fails until it has a summary, at least one `/kind` line, how you tested it, and a release note (`NONE` if nothing user-facing changed; a `/kind breaking` change always needs one).
+- Have at most two pull requests open at a time; a check closes a third. Base each one on `master` with only the change for its issue, not on top of your other open pull requests.
 - Rebase on the latest `master` before you open it.
 - Commit messages: a short imperative subject, for example `Add --json to vm ls`.
 - Only add comments that explain something the code cannot.
