@@ -41,6 +41,21 @@ func (m *MockClientAPI) EXPECT() *MockClientAPIMockRecorder {
 	return m.recorder
 }
 
+// AddSSHKey mocks base method.
+func (m *MockClientAPI) AddSSHKey(ctx context.Context, workspace string, req api.AddSSHKeyRequest) (api.SSHKey, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddSSHKey", ctx, workspace, req)
+	ret0, _ := ret[0].(api.SSHKey)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AddSSHKey indicates an expected call of AddSSHKey.
+func (mr *MockClientAPIMockRecorder) AddSSHKey(ctx, workspace, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddSSHKey", reflect.TypeOf((*MockClientAPI)(nil).AddSSHKey), ctx, workspace, req)
+}
+
 // CreateAssetAccessKey mocks base method.
 func (m *MockClientAPI) CreateAssetAccessKey(ctx context.Context, workspace, bucketUID string, req api.CreateAssetAccessKeyRequest) (api.CreateAssetAccessKeyResult, error) {
 	m.ctrl.T.Helper()
@@ -69,6 +84,21 @@ func (m *MockClientAPI) CreateAssetBucket(ctx context.Context, workspace string,
 func (mr *MockClientAPIMockRecorder) CreateAssetBucket(ctx, workspace, req, idempotency any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAssetBucket", reflect.TypeOf((*MockClientAPI)(nil).CreateAssetBucket), ctx, workspace, req, idempotency)
+}
+
+// DeleteDatabase mocks base method.
+func (m *MockClientAPI) DeleteDatabase(ctx context.Context, workspace, dbUID, idempotency string) (api.DatabaseOperationResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteDatabase", ctx, workspace, dbUID, idempotency)
+	ret0, _ := ret[0].(api.DatabaseOperationResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteDatabase indicates an expected call of DeleteDatabase.
+func (mr *MockClientAPIMockRecorder) DeleteDatabase(ctx, workspace, dbUID, idempotency any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteDatabase", reflect.TypeOf((*MockClientAPI)(nil).DeleteDatabase), ctx, workspace, dbUID, idempotency)
 }
 
 // DeleteVM mocks base method.
@@ -144,6 +174,21 @@ func (m *MockClientAPI) ListAssetBuckets(ctx context.Context, workspace string) 
 func (mr *MockClientAPIMockRecorder) ListAssetBuckets(ctx, workspace any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAssetBuckets", reflect.TypeOf((*MockClientAPI)(nil).ListAssetBuckets), ctx, workspace)
+}
+
+// ListDatabases mocks base method.
+func (m *MockClientAPI) ListDatabases(ctx context.Context, workspace string) ([]api.Database, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListDatabases", ctx, workspace)
+	ret0, _ := ret[0].([]api.Database)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListDatabases indicates an expected call of ListDatabases.
+func (mr *MockClientAPIMockRecorder) ListDatabases(ctx, workspace any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListDatabases", reflect.TypeOf((*MockClientAPI)(nil).ListDatabases), ctx, workspace)
 }
 
 // ListVMApps mocks base method.
