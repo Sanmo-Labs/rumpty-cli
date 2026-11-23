@@ -2,7 +2,9 @@ package ssh
 
 import (
 	"crypto/ed25519"
+	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -43,13 +45,29 @@ type certStoreEntry struct {
 	VMSlug        string           `json:"vm_slug"`
 	GuestUser     string           `json:"guest_user,omitempty"`
 	ExpiresAt     string           `json:"expires_at"`
-	PrivateKeyB64 string           `json:"private_key"` //nolint:gosec // ephemeral SSH key in local cert cache only
+	PrivateKeyB64 string           `json:"private_key,omitempty"` //nolint:gosec // ephemeral SSH key, only when no keychain is available
+	KeyInKeychain bool             `json:"private_key_in_keychain,omitempty"`
 	PublicKeyB64  string           `json:"public_key"`
 	Session       api.CertResponse `json:"session"`
 }
 
 func certCacheKey(apiURL, workspace, vmSlug, guestUser string) string {
 	return apiURL + "\x00" + workspace + "\x00" + vmSlug + "\x00" + guestUser
+}
+
+func certKeyAccount(apiURL, workspace, vmSlug, guestUser string) string {
+	sum := sha256.Sum256([]byte(certCacheKey(apiURL, workspace, vmSlug, guestUser)))
+	return "ssh-key:" + hex.EncodeToString(sum[:12])
+}
+
+func (e *certStoreEntry) account() string {
+	return certKeyAccount(e.APIURL, e.Workspace, e.VMSlug, e.GuestUser)
+}
+
+func (e *certStoreEntry) forgetKey() {
+	if e.KeyInKeychain {
+		credentials.DeleteSecret(e.account())
+	}
 }
 
 func (c *certCache) get(apiURL, workspace, vmSlug, guestUser string) (KeyPair, api.CertResponse, bool) {
@@ -143,6 +161,7 @@ func loadCertStoreEntry(apiURL, workspace, vmSlug, guestUser string) (cachedSess
 		entry := store.Entries[i]
 		expiresAt, err := time.Parse(time.RFC3339, entry.ExpiresAt)
 		if err != nil || !certStillValid(expiresAt) {
+			entry.forgetKey()
 			continue
 		}
 		kept = append(kept, entry)
@@ -159,7 +178,11 @@ func loadCertStoreEntry(apiURL, workspace, vmSlug, guestUser string) (cachedSess
 		return cachedSession{}, false, nil
 	}
 
-	key, err := decodeStoredKeyPair(match.PrivateKeyB64, match.PublicKeyB64)
+	privateB64 := match.PrivateKeyB64
+	if match.KeyInKeychain {
+		privateB64, _ = credentials.LoadSecret(match.account())
+	}
+	key, err := decodeStoredKeyPair(privateB64, match.PublicKeyB64)
 	if err != nil {
 		return cachedSession{}, false, nil
 	}
@@ -189,28 +212,34 @@ func saveCertStoreEntry(apiURL, workspace, vmSlug, guestUser string, key KeyPair
 	var kept []certStoreEntry
 	for i := range store.Entries {
 		entry := store.Entries[i]
-		expiresAt, err := time.Parse(time.RFC3339, entry.ExpiresAt)
-		if err != nil || !certStillValid(expiresAt) {
+		if entry.APIURL == apiURL && entry.Workspace == workspace && entry.VMSlug == vmSlug && entry.GuestUser == guestUser {
 			continue
 		}
-		if entry.APIURL == apiURL && entry.Workspace == workspace && entry.VMSlug == vmSlug && entry.GuestUser == guestUser {
+		expiresAt, err := time.Parse(time.RFC3339, entry.ExpiresAt)
+		if err != nil || !certStillValid(expiresAt) {
+			entry.forgetKey()
 			continue
 		}
 		kept = append(kept, entry)
 	}
 
+	entry := certStoreEntry{
+		APIURL:       apiURL,
+		Workspace:    workspace,
+		VMSlug:       vmSlug,
+		GuestUser:    guestUser,
+		ExpiresAt:    session.ExpiresAt,
+		PublicKeyB64: base64.StdEncoding.EncodeToString(key.Public),
+		Session:      *session,
+	}
 	privB64 := base64.StdEncoding.EncodeToString(key.Private)
-	pubB64 := base64.StdEncoding.EncodeToString(key.Public)
-	kept = append(kept, certStoreEntry{
-		APIURL:        apiURL,
-		Workspace:     workspace,
-		VMSlug:        vmSlug,
-		GuestUser:     guestUser,
-		ExpiresAt:     session.ExpiresAt,
-		PrivateKeyB64: privB64,
-		PublicKeyB64:  pubB64,
-		Session:       *session,
-	})
+	if credentials.StoreSecret(entry.account(), privB64) {
+		entry.KeyInKeychain = true
+	} else {
+		credentials.DeleteSecret(entry.account())
+		entry.PrivateKeyB64 = privB64
+	}
+	kept = append(kept, entry)
 
 	return writeCertStore(kept)
 }
@@ -244,6 +273,9 @@ func decodeStoredKeyPair(privateB64, publicB64 string) (KeyPair, error) {
 	if len(priv) != ed25519.PrivateKeySize || len(pub) != ed25519.PublicKeySize {
 		return KeyPair{}, fmt.Errorf("invalid cached key size")
 	}
+	if !ed25519.PublicKey(pub).Equal(ed25519.PrivateKey(priv).Public()) {
+		return KeyPair{}, fmt.Errorf("cached private key does not match its certificate")
+	}
 	return KeyPair{
 		Public:  ed25519.PublicKey(pub),
 		Private: ed25519.PrivateKey(priv),
@@ -267,8 +299,19 @@ func resetCertStoreForTest() error {
 	return nil
 }
 
-// ClearCertCache removes cached SSH certificates and their private keys.
+// ClearCertCache removes cached SSH certificates and their private keys,
+// including keys kept in the OS keychain.
 func ClearCertCache() error {
 	resetCertCacheForTest()
+	if path, err := certStorePath(); err == nil {
+		if data, err := os.ReadFile(path); err == nil {
+			var store certStoreFile
+			if json.Unmarshal(data, &store) == nil {
+				for i := range store.Entries {
+					store.Entries[i].forgetKey()
+				}
+			}
+		}
+	}
 	return resetCertStoreForTest()
 }

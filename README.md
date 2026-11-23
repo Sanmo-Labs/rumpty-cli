@@ -68,7 +68,7 @@ Sign in through your browser (stores a session for later commands):
 rumpty login
 ```
 
-The session is stored in your OS keychain (macOS Keychain, Windows Credential Manager, or the Secret Service on Linux), with other settings in `~/.config/rumpty`. Without a keychain, as on most servers and CI runners, it is kept in `~/.config/rumpty` readable only by you. Set `RUMPTY_NO_KEYCHAIN=1` to always use the file.
+The session, and the short-lived SSH keys `rumpty ssh` caches between runs, are stored in your OS keychain (macOS Keychain, Windows Credential Manager, or the Secret Service on Linux), with other settings in `~/.config/rumpty`. Without a keychain, as on most servers and CI runners, they are kept in `~/.config/rumpty` readable only by you. Set `RUMPTY_NO_KEYCHAIN=1` to always use the file.
 
 For scripts and CI, pipe an API key to `rumpty login --token-stdin` or set `RUMPTY_API_KEY`.
 
