@@ -1,0 +1,40 @@
+name: Bug report
+description: Something in the CLI does not work as expected
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: For security problems, do not open an issue. Follow SECURITY.md instead.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Output of `rumpty --version`
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: macOS 15 (arm64), Ubuntu 24.04, Windows 11
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: The commands you ran. Remove tokens, keys and workspace names you don't want public.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected and what happened
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Debug output
+      description: Run the command again with `--verbose` and paste the relevant part.
+      render: text
