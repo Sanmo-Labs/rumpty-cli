@@ -26,6 +26,7 @@ type ClientAPI interface {
 	StartDevice(ctx context.Context) (DeviceAuthStartResponse, error)
 	PollDeviceToken(ctx context.Context, deviceCode string) (DeviceAuthPollResponse, error)
 	IssueSSHCert(ctx context.Context, workspace string, req CertRequest) (CertResponse, error)
+	ListInvoices(ctx context.Context) ([]Invoice, error)
 }
 
 var _ ClientAPI = (*Client)(nil)
