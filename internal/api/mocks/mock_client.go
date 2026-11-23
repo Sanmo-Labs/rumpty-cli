@@ -205,6 +205,20 @@ func (mr *MockClientAPIMockRecorder) Logout(ctx any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Logout", reflect.TypeOf((*MockClientAPI)(nil).Logout), ctx)
 }
 
+// LogoutAll mocks base method.
+func (m *MockClientAPI) LogoutAll(ctx context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LogoutAll", ctx)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// LogoutAll indicates an expected call of LogoutAll.
+func (mr *MockClientAPIMockRecorder) LogoutAll(ctx any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LogoutAll", reflect.TypeOf((*MockClientAPI)(nil).LogoutAll), ctx)
+}
+
 // Me mocks base method.
 func (m *MockClientAPI) Me(ctx context.Context) (api.User, error) {
 	m.ctrl.T.Helper()
