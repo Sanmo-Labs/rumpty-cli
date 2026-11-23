@@ -1,0 +1,60 @@
+name: PR description
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+permissions:
+  contents: read
+
+jobs:
+  template:
+    name: Follows the PR template
+    if: ${{ !endsWith(github.event.pull_request.user.login, '[bot]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the description
+        shell: python
+        run: |
+          import json, os, re, sys
+
+          with open(os.environ["GITHUB_EVENT_PATH"], encoding="utf-8") as f:
+              body = json.load(f)["pull_request"].get("body") or ""
+          body = re.sub(r"<!--.*?-->", "", body, flags=re.S).replace("\r\n", "\n")
+
+          def section(title):
+              m = re.search(rf"^##\s+{re.escape(title)}\s*$(.*?)(?=^##\s|\Z)", body, flags=re.M | re.S | re.I)
+              return None if m is None else m.group(1).strip()
+
+          errors = []
+          summary = section("Summary")
+          if summary is None:
+              errors.append("Add the '## Summary' section from the PR template.")
+          elif len(summary) < 20:
+              errors.append("Describe what the change does and why under '## Summary'.")
+
+          kinds = {"bug", "feature", "security", "breaking", "docs", "cleanup", "chore"}
+          found = re.findall(r"^\s*/kind\s+(\S+)\s*$", body, flags=re.M)
+          if not found:
+              errors.append("Add at least one '/kind <type>' line under '## Type of change', e.g. /kind feature.")
+          for k in found:
+              if k not in kinds:
+                  errors.append(f"Unknown /kind '{k}'. Use one of: {', '.join(sorted(kinds))}.")
+
+          tested = section("How was this tested?")
+          if tested is None:
+              errors.append("Add the '## How was this tested?' section from the PR template.")
+          elif len(tested) < 8:
+              errors.append("Say how you tested the change under '## How was this tested?' (or 'Docs only').")
+
+          note = re.search(r"```release-note[ \t]*\n(.*?)```", body, flags=re.S)
+          if note is None:
+              errors.append("Keep the release-note block from the PR template.")
+          elif not note.group(1).strip():
+              errors.append("Write a release note, or NONE if nothing user-facing changed.")
+          elif "breaking" in found and note.group(1).strip().upper() == "NONE":
+              errors.append("A /kind breaking change needs a release note telling users what changed.")
+
+          for e in errors:
+              print(f"::error::{e}")
+          sys.exit(1 if errors else 0)

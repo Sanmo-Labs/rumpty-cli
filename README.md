@@ -153,3 +153,15 @@ completion also needs a workspace: it uses `--ws`/`--workspace`,
 `$RUMPTY_WORKSPACE`, or your default workspace when none is set. If the API is
 unreachable, completion fails quietly (no suggestions) instead of blocking the
 prompt.
+
+## Community
+
+Questions, ideas or want to chat with the team and other users? Join us on [Discord](https://discord.gg/BnFdQrMBhC).
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to build, test and send a pull request. Report security problems privately as described in [SECURITY.md](SECURITY.md).
+
+## License
+
+Apache License 2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
