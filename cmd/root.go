@@ -87,6 +87,10 @@ func NewRoot(rt *app.Runtime) *cobra.Command {
 		newExecCmd(rt),
 		newCopyCmd(rt),
 		newSyncCmd(rt),
+		newDBCmd(rt),
+		newSSHKeyCmd(rt),
+		newAPIKeyCmd(rt),
+		newBucketCmd(rt),
 	)
 
 	defaultHelp := cmd.HelpFunc()
