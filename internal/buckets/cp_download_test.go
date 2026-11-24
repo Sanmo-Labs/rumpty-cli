@@ -16,7 +16,7 @@ func TestDownloadFile_keepsDestinationWhenDownloadFails(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Length", "100")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("partial"))
+		_, _ = w.Write([]byte("partial"))
 		panic(http.ErrAbortHandler)
 	}))
 	defer srv.Close()
@@ -34,7 +34,7 @@ func TestDownloadFile_keepsDestinationWhenDownloadFails(t *testing.T) {
 
 func TestDownloadFile_replacesDestinationOnSuccess(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("new contents"))
+		_, _ = w.Write([]byte("new contents"))
 	}))
 	defer srv.Close()
 
