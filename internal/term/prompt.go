@@ -40,3 +40,19 @@ func Password(errOut io.Writer, label string) (string, error) {
 	}
 	return strings.TrimSpace(string(bytes)), nil
 }
+
+// Confirm asks a yes/no question on errOut and reads the answer from in.
+// An empty answer counts as no.
+func Confirm(in io.Reader, errOut io.Writer, prompt string) (bool, error) {
+	if in == nil {
+		in = os.Stdin
+	}
+	fmt.Fprintf(errOut, "%s [y/N]: ", prompt)
+	reader := bufio.NewReader(in)
+	line, err := reader.ReadString('\n')
+	if err != nil && err != io.EOF {
+		return false, err
+	}
+	answer := strings.ToLower(strings.TrimSpace(line))
+	return answer == "y" || answer == "yes", nil
+}
