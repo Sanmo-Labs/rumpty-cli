@@ -86,6 +86,21 @@ func (mr *MockClientAPIMockRecorder) DeleteVM(ctx, workspace, vmUID, idempotency
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteVM", reflect.TypeOf((*MockClientAPI)(nil).DeleteVM), ctx, workspace, vmUID, idempotency)
 }
 
+// DownloadInvoicePDF mocks base method.
+func (m *MockClientAPI) DownloadInvoicePDF(ctx context.Context, uid string) (api.InvoicePDF, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DownloadInvoicePDF", ctx, uid)
+	ret0, _ := ret[0].(api.InvoicePDF)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DownloadInvoicePDF indicates an expected call of DownloadInvoicePDF.
+func (mr *MockClientAPIMockRecorder) DownloadInvoicePDF(ctx, uid any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DownloadInvoicePDF", reflect.TypeOf((*MockClientAPI)(nil).DownloadInvoicePDF), ctx, uid)
+}
+
 // ExposeVMApp mocks base method.
 func (m *MockClientAPI) ExposeVMApp(ctx context.Context, workspace, vmUID string, req api.ExposeVMAppRequest, idempotency string) (api.ExposeVMAppResult, error) {
 	m.ctrl.T.Helper()
