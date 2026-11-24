@@ -100,6 +100,7 @@ Add `--watch` to keep syncing as files change, or `--daemon` to do the same in a
 | `expose` / `unexpose` | Add or remove a public URL for a VM service |
 | `vm` | Manage workspace VMs: `ls`, `start`, `stop`, `reboot`, `delete` |
 | `workspaces` | List workspaces you can access |
+| `mcp` | Show how to connect Cursor, Claude Code, VS Code and other AI clients to Rumpty MCP |
 | `completion` | Generate shell autocompletion script |
 
 Use `rumpty [command] --help` for details on any command.
