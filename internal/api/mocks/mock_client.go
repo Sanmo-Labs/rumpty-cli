@@ -41,6 +41,96 @@ func (m *MockClientAPI) EXPECT() *MockClientAPIMockRecorder {
 	return m.recorder
 }
 
+// AddFirewallRule mocks base method.
+func (m *MockClientAPI) AddFirewallRule(ctx context.Context, workspace, policyUID string, req *api.AddFirewallRuleRequest) (api.FirewallRuleResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddFirewallRule", ctx, workspace, policyUID, req)
+	ret0, _ := ret[0].(api.FirewallRuleResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AddFirewallRule indicates an expected call of AddFirewallRule.
+func (mr *MockClientAPIMockRecorder) AddFirewallRule(ctx, workspace, policyUID, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddFirewallRule", reflect.TypeOf((*MockClientAPI)(nil).AddFirewallRule), ctx, workspace, policyUID, req)
+}
+
+// AddSSHKey mocks base method.
+func (m *MockClientAPI) AddSSHKey(ctx context.Context, workspace string, req api.AddSSHKeyRequest) (api.SSHKey, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddSSHKey", ctx, workspace, req)
+	ret0, _ := ret[0].(api.SSHKey)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AddSSHKey indicates an expected call of AddSSHKey.
+func (mr *MockClientAPIMockRecorder) AddSSHKey(ctx, workspace, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddSSHKey", reflect.TypeOf((*MockClientAPI)(nil).AddSSHKey), ctx, workspace, req)
+}
+
+// AttachFirewallPolicy mocks base method.
+func (m *MockClientAPI) AttachFirewallPolicy(ctx context.Context, workspace, policyUID string, req api.FirewallAttachRequest) (api.FirewallAttachResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AttachFirewallPolicy", ctx, workspace, policyUID, req)
+	ret0, _ := ret[0].(api.FirewallAttachResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AttachFirewallPolicy indicates an expected call of AttachFirewallPolicy.
+func (mr *MockClientAPIMockRecorder) AttachFirewallPolicy(ctx, workspace, policyUID, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AttachFirewallPolicy", reflect.TypeOf((*MockClientAPI)(nil).AttachFirewallPolicy), ctx, workspace, policyUID, req)
+}
+
+// AttachVolume mocks base method.
+func (m *MockClientAPI) AttachVolume(ctx context.Context, workspace, volumeUID, vmUID string) (api.VolumeOperationResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AttachVolume", ctx, workspace, volumeUID, vmUID)
+	ret0, _ := ret[0].(api.VolumeOperationResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AttachVolume indicates an expected call of AttachVolume.
+func (mr *MockClientAPIMockRecorder) AttachVolume(ctx, workspace, volumeUID, vmUID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AttachVolume", reflect.TypeOf((*MockClientAPI)(nil).AttachVolume), ctx, workspace, volumeUID, vmUID)
+}
+
+// CompleteAssetUpload mocks base method.
+func (m *MockClientAPI) CompleteAssetUpload(ctx context.Context, workspace, objectUID string) (api.AssetObject, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CompleteAssetUpload", ctx, workspace, objectUID)
+	ret0, _ := ret[0].(api.AssetObject)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CompleteAssetUpload indicates an expected call of CompleteAssetUpload.
+func (mr *MockClientAPIMockRecorder) CompleteAssetUpload(ctx, workspace, objectUID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CompleteAssetUpload", reflect.TypeOf((*MockClientAPI)(nil).CompleteAssetUpload), ctx, workspace, objectUID)
+}
+
+// CreateAPIKey mocks base method.
+func (m *MockClientAPI) CreateAPIKey(ctx context.Context, req api.CreateAPIKeyRequest) (api.CreateAPIKeyResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateAPIKey", ctx, req)
+	ret0, _ := ret[0].(api.CreateAPIKeyResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateAPIKey indicates an expected call of CreateAPIKey.
+func (mr *MockClientAPIMockRecorder) CreateAPIKey(ctx, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAPIKey", reflect.TypeOf((*MockClientAPI)(nil).CreateAPIKey), ctx, req)
+}
+
 // CreateAssetAccessKey mocks base method.
 func (m *MockClientAPI) CreateAssetAccessKey(ctx context.Context, workspace, bucketUID string, req api.CreateAssetAccessKeyRequest) (api.CreateAssetAccessKeyResult, error) {
 	m.ctrl.T.Helper()
@@ -71,6 +161,167 @@ func (mr *MockClientAPIMockRecorder) CreateAssetBucket(ctx, workspace, req, idem
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAssetBucket", reflect.TypeOf((*MockClientAPI)(nil).CreateAssetBucket), ctx, workspace, req, idempotency)
 }
 
+// CreateAssetUpload mocks base method.
+func (m *MockClientAPI) CreateAssetUpload(ctx context.Context, workspace, bucketUID string, req *api.CreateAssetUploadRequest) (api.AssetUploadResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateAssetUpload", ctx, workspace, bucketUID, req)
+	ret0, _ := ret[0].(api.AssetUploadResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateAssetUpload indicates an expected call of CreateAssetUpload.
+func (mr *MockClientAPIMockRecorder) CreateAssetUpload(ctx, workspace, bucketUID, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAssetUpload", reflect.TypeOf((*MockClientAPI)(nil).CreateAssetUpload), ctx, workspace, bucketUID, req)
+}
+
+// CreateCluster mocks base method.
+func (m *MockClientAPI) CreateCluster(ctx context.Context, workspace string, req *api.CreateClusterRequest, idempotency string) (api.ClusterOperationResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateCluster", ctx, workspace, req, idempotency)
+	ret0, _ := ret[0].(api.ClusterOperationResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateCluster indicates an expected call of CreateCluster.
+func (mr *MockClientAPIMockRecorder) CreateCluster(ctx, workspace, req, idempotency any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCluster", reflect.TypeOf((*MockClientAPI)(nil).CreateCluster), ctx, workspace, req, idempotency)
+}
+
+// CreateFirewallPolicy mocks base method.
+func (m *MockClientAPI) CreateFirewallPolicy(ctx context.Context, workspace string, req api.CreateFirewallPolicyRequest) (api.FirewallPolicy, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateFirewallPolicy", ctx, workspace, req)
+	ret0, _ := ret[0].(api.FirewallPolicy)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateFirewallPolicy indicates an expected call of CreateFirewallPolicy.
+func (mr *MockClientAPIMockRecorder) CreateFirewallPolicy(ctx, workspace, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateFirewallPolicy", reflect.TypeOf((*MockClientAPI)(nil).CreateFirewallPolicy), ctx, workspace, req)
+}
+
+// CreateObjectReadURL mocks base method.
+func (m *MockClientAPI) CreateObjectReadURL(ctx context.Context, workspace, objectUID string) (api.ObjectReadURLResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateObjectReadURL", ctx, workspace, objectUID)
+	ret0, _ := ret[0].(api.ObjectReadURLResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateObjectReadURL indicates an expected call of CreateObjectReadURL.
+func (mr *MockClientAPIMockRecorder) CreateObjectReadURL(ctx, workspace, objectUID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateObjectReadURL", reflect.TypeOf((*MockClientAPI)(nil).CreateObjectReadURL), ctx, workspace, objectUID)
+}
+
+// CreateVolume mocks base method.
+func (m *MockClientAPI) CreateVolume(ctx context.Context, workspace string, req api.CreateVolumeRequest) (api.VolumeOperationResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateVolume", ctx, workspace, req)
+	ret0, _ := ret[0].(api.VolumeOperationResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateVolume indicates an expected call of CreateVolume.
+func (mr *MockClientAPIMockRecorder) CreateVolume(ctx, workspace, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateVolume", reflect.TypeOf((*MockClientAPI)(nil).CreateVolume), ctx, workspace, req)
+}
+
+// DeleteBucketObject mocks base method.
+func (m *MockClientAPI) DeleteBucketObject(ctx context.Context, workspace, objectUID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteBucketObject", ctx, workspace, objectUID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteBucketObject indicates an expected call of DeleteBucketObject.
+func (mr *MockClientAPIMockRecorder) DeleteBucketObject(ctx, workspace, objectUID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteBucketObject", reflect.TypeOf((*MockClientAPI)(nil).DeleteBucketObject), ctx, workspace, objectUID)
+}
+
+// DeleteCluster mocks base method.
+func (m *MockClientAPI) DeleteCluster(ctx context.Context, workspace, uid string) (api.ClusterOperationResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteCluster", ctx, workspace, uid)
+	ret0, _ := ret[0].(api.ClusterOperationResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteCluster indicates an expected call of DeleteCluster.
+func (mr *MockClientAPIMockRecorder) DeleteCluster(ctx, workspace, uid any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCluster", reflect.TypeOf((*MockClientAPI)(nil).DeleteCluster), ctx, workspace, uid)
+}
+
+// DeleteDatabase mocks base method.
+func (m *MockClientAPI) DeleteDatabase(ctx context.Context, workspace, dbUID, idempotency string) (api.DatabaseOperationResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteDatabase", ctx, workspace, dbUID, idempotency)
+	ret0, _ := ret[0].(api.DatabaseOperationResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteDatabase indicates an expected call of DeleteDatabase.
+func (mr *MockClientAPIMockRecorder) DeleteDatabase(ctx, workspace, dbUID, idempotency any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteDatabase", reflect.TypeOf((*MockClientAPI)(nil).DeleteDatabase), ctx, workspace, dbUID, idempotency)
+}
+
+// DeleteFirewallPolicy mocks base method.
+func (m *MockClientAPI) DeleteFirewallPolicy(ctx context.Context, workspace, uid string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteFirewallPolicy", ctx, workspace, uid)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteFirewallPolicy indicates an expected call of DeleteFirewallPolicy.
+func (mr *MockClientAPIMockRecorder) DeleteFirewallPolicy(ctx, workspace, uid any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteFirewallPolicy", reflect.TypeOf((*MockClientAPI)(nil).DeleteFirewallPolicy), ctx, workspace, uid)
+}
+
+// DeleteFirewallRule mocks base method.
+func (m *MockClientAPI) DeleteFirewallRule(ctx context.Context, workspace, policyUID, ruleUID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteFirewallRule", ctx, workspace, policyUID, ruleUID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteFirewallRule indicates an expected call of DeleteFirewallRule.
+func (mr *MockClientAPIMockRecorder) DeleteFirewallRule(ctx, workspace, policyUID, ruleUID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteFirewallRule", reflect.TypeOf((*MockClientAPI)(nil).DeleteFirewallRule), ctx, workspace, policyUID, ruleUID)
+}
+
+// DeleteSSHKey mocks base method.
+func (m *MockClientAPI) DeleteSSHKey(ctx context.Context, workspace, uid string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteSSHKey", ctx, workspace, uid)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteSSHKey indicates an expected call of DeleteSSHKey.
+func (mr *MockClientAPIMockRecorder) DeleteSSHKey(ctx, workspace, uid any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSSHKey", reflect.TypeOf((*MockClientAPI)(nil).DeleteSSHKey), ctx, workspace, uid)
+}
+
 // DeleteVM mocks base method.
 func (m *MockClientAPI) DeleteVM(ctx context.Context, workspace, vmUID, idempotency string) (api.VMOperationResult, error) {
 	m.ctrl.T.Helper()
@@ -84,6 +335,50 @@ func (m *MockClientAPI) DeleteVM(ctx context.Context, workspace, vmUID, idempote
 func (mr *MockClientAPIMockRecorder) DeleteVM(ctx, workspace, vmUID, idempotency any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteVM", reflect.TypeOf((*MockClientAPI)(nil).DeleteVM), ctx, workspace, vmUID, idempotency)
+}
+
+// DeleteVolume mocks base method.
+func (m *MockClientAPI) DeleteVolume(ctx context.Context, workspace, uid string) (api.VolumeOperationResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteVolume", ctx, workspace, uid)
+	ret0, _ := ret[0].(api.VolumeOperationResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteVolume indicates an expected call of DeleteVolume.
+func (mr *MockClientAPIMockRecorder) DeleteVolume(ctx, workspace, uid any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteVolume", reflect.TypeOf((*MockClientAPI)(nil).DeleteVolume), ctx, workspace, uid)
+}
+
+// DetachFirewallPolicy mocks base method.
+func (m *MockClientAPI) DetachFirewallPolicy(ctx context.Context, workspace, policyUID, attachmentUID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DetachFirewallPolicy", ctx, workspace, policyUID, attachmentUID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DetachFirewallPolicy indicates an expected call of DetachFirewallPolicy.
+func (mr *MockClientAPIMockRecorder) DetachFirewallPolicy(ctx, workspace, policyUID, attachmentUID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DetachFirewallPolicy", reflect.TypeOf((*MockClientAPI)(nil).DetachFirewallPolicy), ctx, workspace, policyUID, attachmentUID)
+}
+
+// DetachVolume mocks base method.
+func (m *MockClientAPI) DetachVolume(ctx context.Context, workspace, volumeUID string) (api.VolumeOperationResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DetachVolume", ctx, workspace, volumeUID)
+	ret0, _ := ret[0].(api.VolumeOperationResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DetachVolume indicates an expected call of DetachVolume.
+func (mr *MockClientAPIMockRecorder) DetachVolume(ctx, workspace, volumeUID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DetachVolume", reflect.TypeOf((*MockClientAPI)(nil).DetachVolume), ctx, workspace, volumeUID)
 }
 
 // ExposeVMApp mocks base method.
@@ -101,6 +396,36 @@ func (mr *MockClientAPIMockRecorder) ExposeVMApp(ctx, workspace, vmUID, req, ide
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExposeVMApp", reflect.TypeOf((*MockClientAPI)(nil).ExposeVMApp), ctx, workspace, vmUID, req, idempotency)
 }
 
+// GetCluster mocks base method.
+func (m *MockClientAPI) GetCluster(ctx context.Context, workspace, uid string) (api.Cluster, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCluster", ctx, workspace, uid)
+	ret0, _ := ret[0].(api.Cluster)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCluster indicates an expected call of GetCluster.
+func (mr *MockClientAPIMockRecorder) GetCluster(ctx, workspace, uid any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCluster", reflect.TypeOf((*MockClientAPI)(nil).GetCluster), ctx, workspace, uid)
+}
+
+// GetFirewallPolicy mocks base method.
+func (m *MockClientAPI) GetFirewallPolicy(ctx context.Context, workspace, policyUID string) (api.FirewallPolicy, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFirewallPolicy", ctx, workspace, policyUID)
+	ret0, _ := ret[0].(api.FirewallPolicy)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetFirewallPolicy indicates an expected call of GetFirewallPolicy.
+func (mr *MockClientAPIMockRecorder) GetFirewallPolicy(ctx, workspace, policyUID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFirewallPolicy", reflect.TypeOf((*MockClientAPI)(nil).GetFirewallPolicy), ctx, workspace, policyUID)
+}
+
 // GetOperation mocks base method.
 func (m *MockClientAPI) GetOperation(ctx context.Context, workspace, operationID string) (api.Operation, error) {
 	m.ctrl.T.Helper()
@@ -114,6 +439,21 @@ func (m *MockClientAPI) GetOperation(ctx context.Context, workspace, operationID
 func (mr *MockClientAPIMockRecorder) GetOperation(ctx, workspace, operationID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOperation", reflect.TypeOf((*MockClientAPI)(nil).GetOperation), ctx, workspace, operationID)
+}
+
+// InviteWorkspaceMember mocks base method.
+func (m *MockClientAPI) InviteWorkspaceMember(ctx context.Context, workspaceUID, workspaceSlug string, req api.InviteWorkspaceMemberRequest) (api.WorkspaceInvitation, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InviteWorkspaceMember", ctx, workspaceUID, workspaceSlug, req)
+	ret0, _ := ret[0].(api.WorkspaceInvitation)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// InviteWorkspaceMember indicates an expected call of InviteWorkspaceMember.
+func (mr *MockClientAPIMockRecorder) InviteWorkspaceMember(ctx, workspaceUID, workspaceSlug, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InviteWorkspaceMember", reflect.TypeOf((*MockClientAPI)(nil).InviteWorkspaceMember), ctx, workspaceUID, workspaceSlug, req)
 }
 
 // IssueSSHCert mocks base method.
@@ -131,6 +471,36 @@ func (mr *MockClientAPIMockRecorder) IssueSSHCert(ctx, workspace, req any) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IssueSSHCert", reflect.TypeOf((*MockClientAPI)(nil).IssueSSHCert), ctx, workspace, req)
 }
 
+// ListAPIKeys mocks base method.
+func (m *MockClientAPI) ListAPIKeys(ctx context.Context) ([]api.APIKey, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListAPIKeys", ctx)
+	ret0, _ := ret[0].([]api.APIKey)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListAPIKeys indicates an expected call of ListAPIKeys.
+func (mr *MockClientAPIMockRecorder) ListAPIKeys(ctx any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAPIKeys", reflect.TypeOf((*MockClientAPI)(nil).ListAPIKeys), ctx)
+}
+
+// ListAssetAccessKeys mocks base method.
+func (m *MockClientAPI) ListAssetAccessKeys(ctx context.Context, workspace, bucketUID string) ([]api.AssetAccessKey, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListAssetAccessKeys", ctx, workspace, bucketUID)
+	ret0, _ := ret[0].([]api.AssetAccessKey)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListAssetAccessKeys indicates an expected call of ListAssetAccessKeys.
+func (mr *MockClientAPIMockRecorder) ListAssetAccessKeys(ctx, workspace, bucketUID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAssetAccessKeys", reflect.TypeOf((*MockClientAPI)(nil).ListAssetAccessKeys), ctx, workspace, bucketUID)
+}
+
 // ListAssetBuckets mocks base method.
 func (m *MockClientAPI) ListAssetBuckets(ctx context.Context, workspace string) ([]api.AssetBucket, error) {
 	m.ctrl.T.Helper()
@@ -144,6 +514,96 @@ func (m *MockClientAPI) ListAssetBuckets(ctx context.Context, workspace string) 
 func (mr *MockClientAPIMockRecorder) ListAssetBuckets(ctx, workspace any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAssetBuckets", reflect.TypeOf((*MockClientAPI)(nil).ListAssetBuckets), ctx, workspace)
+}
+
+// ListBucketObjects mocks base method.
+func (m *MockClientAPI) ListBucketObjects(ctx context.Context, workspace, bucketUID string) ([]api.AssetObject, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListBucketObjects", ctx, workspace, bucketUID)
+	ret0, _ := ret[0].([]api.AssetObject)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListBucketObjects indicates an expected call of ListBucketObjects.
+func (mr *MockClientAPIMockRecorder) ListBucketObjects(ctx, workspace, bucketUID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListBucketObjects", reflect.TypeOf((*MockClientAPI)(nil).ListBucketObjects), ctx, workspace, bucketUID)
+}
+
+// ListClusters mocks base method.
+func (m *MockClientAPI) ListClusters(ctx context.Context, workspace string) ([]api.Cluster, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListClusters", ctx, workspace)
+	ret0, _ := ret[0].([]api.Cluster)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListClusters indicates an expected call of ListClusters.
+func (mr *MockClientAPIMockRecorder) ListClusters(ctx, workspace any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListClusters", reflect.TypeOf((*MockClientAPI)(nil).ListClusters), ctx, workspace)
+}
+
+// ListDatabases mocks base method.
+func (m *MockClientAPI) ListDatabases(ctx context.Context, workspace string) ([]api.Database, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListDatabases", ctx, workspace)
+	ret0, _ := ret[0].([]api.Database)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListDatabases indicates an expected call of ListDatabases.
+func (mr *MockClientAPIMockRecorder) ListDatabases(ctx, workspace any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListDatabases", reflect.TypeOf((*MockClientAPI)(nil).ListDatabases), ctx, workspace)
+}
+
+// ListFirewallPolicies mocks base method.
+func (m *MockClientAPI) ListFirewallPolicies(ctx context.Context, workspace string) ([]api.FirewallPolicy, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListFirewallPolicies", ctx, workspace)
+	ret0, _ := ret[0].([]api.FirewallPolicy)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListFirewallPolicies indicates an expected call of ListFirewallPolicies.
+func (mr *MockClientAPIMockRecorder) ListFirewallPolicies(ctx, workspace any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFirewallPolicies", reflect.TypeOf((*MockClientAPI)(nil).ListFirewallPolicies), ctx, workspace)
+}
+
+// ListInvitations mocks base method.
+func (m *MockClientAPI) ListInvitations(ctx context.Context, workspaceUID, workspaceSlug string) ([]api.WorkspaceInvitation, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListInvitations", ctx, workspaceUID, workspaceSlug)
+	ret0, _ := ret[0].([]api.WorkspaceInvitation)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListInvitations indicates an expected call of ListInvitations.
+func (mr *MockClientAPIMockRecorder) ListInvitations(ctx, workspaceUID, workspaceSlug any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListInvitations", reflect.TypeOf((*MockClientAPI)(nil).ListInvitations), ctx, workspaceUID, workspaceSlug)
+}
+
+// ListSSHKeys mocks base method.
+func (m *MockClientAPI) ListSSHKeys(ctx context.Context, workspace string) ([]api.SSHKey, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListSSHKeys", ctx, workspace)
+	ret0, _ := ret[0].([]api.SSHKey)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListSSHKeys indicates an expected call of ListSSHKeys.
+func (mr *MockClientAPIMockRecorder) ListSSHKeys(ctx, workspace any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListSSHKeys", reflect.TypeOf((*MockClientAPI)(nil).ListSSHKeys), ctx, workspace)
 }
 
 // ListVMApps mocks base method.
@@ -174,6 +634,36 @@ func (m *MockClientAPI) ListVMs(ctx context.Context, workspace string) ([]api.VM
 func (mr *MockClientAPIMockRecorder) ListVMs(ctx, workspace any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListVMs", reflect.TypeOf((*MockClientAPI)(nil).ListVMs), ctx, workspace)
+}
+
+// ListVolumes mocks base method.
+func (m *MockClientAPI) ListVolumes(ctx context.Context, workspace string) ([]api.Volume, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListVolumes", ctx, workspace)
+	ret0, _ := ret[0].([]api.Volume)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListVolumes indicates an expected call of ListVolumes.
+func (mr *MockClientAPIMockRecorder) ListVolumes(ctx, workspace any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListVolumes", reflect.TypeOf((*MockClientAPI)(nil).ListVolumes), ctx, workspace)
+}
+
+// ListWorkspaceMembers mocks base method.
+func (m *MockClientAPI) ListWorkspaceMembers(ctx context.Context, workspaceUID, workspaceSlug string) ([]api.WorkspaceMember, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListWorkspaceMembers", ctx, workspaceUID, workspaceSlug)
+	ret0, _ := ret[0].([]api.WorkspaceMember)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListWorkspaceMembers indicates an expected call of ListWorkspaceMembers.
+func (mr *MockClientAPIMockRecorder) ListWorkspaceMembers(ctx, workspaceUID, workspaceSlug any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListWorkspaceMembers", reflect.TypeOf((*MockClientAPI)(nil).ListWorkspaceMembers), ctx, workspaceUID, workspaceSlug)
 }
 
 // ListWorkspaces mocks base method.
@@ -264,6 +754,35 @@ func (mr *MockClientAPIMockRecorder) RebootVM(ctx, workspace, vmUID, idempotency
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RebootVM", reflect.TypeOf((*MockClientAPI)(nil).RebootVM), ctx, workspace, vmUID, idempotency)
 }
 
+// RemoveWorkspaceMember mocks base method.
+func (m *MockClientAPI) RemoveWorkspaceMember(ctx context.Context, workspaceUID, workspaceSlug, memberUID string) (api.WorkspaceMember, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemoveWorkspaceMember", ctx, workspaceUID, workspaceSlug, memberUID)
+	ret0, _ := ret[0].(api.WorkspaceMember)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RemoveWorkspaceMember indicates an expected call of RemoveWorkspaceMember.
+func (mr *MockClientAPIMockRecorder) RemoveWorkspaceMember(ctx, workspaceUID, workspaceSlug, memberUID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveWorkspaceMember", reflect.TypeOf((*MockClientAPI)(nil).RemoveWorkspaceMember), ctx, workspaceUID, workspaceSlug, memberUID)
+}
+
+// RevokeAPIKey mocks base method.
+func (m *MockClientAPI) RevokeAPIKey(ctx context.Context, uid string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RevokeAPIKey", ctx, uid)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RevokeAPIKey indicates an expected call of RevokeAPIKey.
+func (mr *MockClientAPIMockRecorder) RevokeAPIKey(ctx, uid any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RevokeAPIKey", reflect.TypeOf((*MockClientAPI)(nil).RevokeAPIKey), ctx, uid)
+}
+
 // RevokeAssetAccessKey mocks base method.
 func (m *MockClientAPI) RevokeAssetAccessKey(ctx context.Context, workspace, keyUID string) error {
 	m.ctrl.T.Helper()
@@ -276,6 +795,21 @@ func (m *MockClientAPI) RevokeAssetAccessKey(ctx context.Context, workspace, key
 func (mr *MockClientAPIMockRecorder) RevokeAssetAccessKey(ctx, workspace, keyUID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RevokeAssetAccessKey", reflect.TypeOf((*MockClientAPI)(nil).RevokeAssetAccessKey), ctx, workspace, keyUID)
+}
+
+// RevokeInvitation mocks base method.
+func (m *MockClientAPI) RevokeInvitation(ctx context.Context, workspaceUID, workspaceSlug, invitationUID string) (api.WorkspaceInvitation, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RevokeInvitation", ctx, workspaceUID, workspaceSlug, invitationUID)
+	ret0, _ := ret[0].(api.WorkspaceInvitation)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RevokeInvitation indicates an expected call of RevokeInvitation.
+func (mr *MockClientAPIMockRecorder) RevokeInvitation(ctx, workspaceUID, workspaceSlug, invitationUID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RevokeInvitation", reflect.TypeOf((*MockClientAPI)(nil).RevokeInvitation), ctx, workspaceUID, workspaceSlug, invitationUID)
 }
 
 // StartDevice mocks base method.
@@ -336,4 +870,19 @@ func (m *MockClientAPI) UnexposeVMApp(ctx context.Context, workspace, vmUID, app
 func (mr *MockClientAPIMockRecorder) UnexposeVMApp(ctx, workspace, vmUID, app, idempotency any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnexposeVMApp", reflect.TypeOf((*MockClientAPI)(nil).UnexposeVMApp), ctx, workspace, vmUID, app, idempotency)
+}
+
+// UpdateWorkspaceMemberRole mocks base method.
+func (m *MockClientAPI) UpdateWorkspaceMemberRole(ctx context.Context, workspaceUID, workspaceSlug, memberUID, role string) (api.WorkspaceMember, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateWorkspaceMemberRole", ctx, workspaceUID, workspaceSlug, memberUID, role)
+	ret0, _ := ret[0].(api.WorkspaceMember)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateWorkspaceMemberRole indicates an expected call of UpdateWorkspaceMemberRole.
+func (mr *MockClientAPIMockRecorder) UpdateWorkspaceMemberRole(ctx, workspaceUID, workspaceSlug, memberUID, role any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateWorkspaceMemberRole", reflect.TypeOf((*MockClientAPI)(nil).UpdateWorkspaceMemberRole), ctx, workspaceUID, workspaceSlug, memberUID, role)
 }
