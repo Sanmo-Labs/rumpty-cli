@@ -26,6 +26,29 @@ type ClientAPI interface {
 	StartDevice(ctx context.Context) (DeviceAuthStartResponse, error)
 	PollDeviceToken(ctx context.Context, deviceCode string) (DeviceAuthPollResponse, error)
 	IssueSSHCert(ctx context.Context, workspace string, req CertRequest) (CertResponse, error)
+	AddSSHKey(ctx context.Context, workspace string, req AddSSHKeyRequest) (SSHKey, error)
+	ListSSHKeys(ctx context.Context, workspace string) ([]SSHKey, error)
+	DeleteSSHKey(ctx context.Context, workspace, uid string) error
+	ListAPIKeys(ctx context.Context) ([]APIKey, error)
+	RevokeAPIKey(ctx context.Context, uid string) error
+	ListBucketObjects(ctx context.Context, workspace, bucketUID string) ([]AssetObject, error)
+	DeleteBucketObject(ctx context.Context, workspace, objectUID string) error
+	ListFirewallPolicies(ctx context.Context, workspace string) ([]FirewallPolicy, error)
+	CreateFirewallPolicy(ctx context.Context, workspace string, req CreateFirewallPolicyRequest) (FirewallPolicy, error)
+	DeleteFirewallPolicy(ctx context.Context, workspace, uid string) error
+	ListVolumes(ctx context.Context, workspace string) ([]Volume, error)
+	CreateVolume(ctx context.Context, workspace string, req CreateVolumeRequest) (VolumeOperationResult, error)
+	DeleteVolume(ctx context.Context, workspace, uid string) (VolumeOperationResult, error)
+	ListWorkspaceMembers(ctx context.Context, workspaceUID, workspaceSlug string) ([]WorkspaceMember, error)
+	InviteWorkspaceMember(ctx context.Context, workspaceUID, workspaceSlug string, req InviteWorkspaceMemberRequest) (WorkspaceInvitation, error)
+	RemoveWorkspaceMember(ctx context.Context, workspaceUID, workspaceSlug, memberUID string) (WorkspaceMember, error)
+	UpdateWorkspaceMemberRole(ctx context.Context, workspaceUID, workspaceSlug, memberUID, role string) (WorkspaceMember, error)
+	ListClusters(ctx context.Context, workspace string) ([]Cluster, error)
+	DeleteCluster(ctx context.Context, workspace, uid string) (ClusterOperationResult, error)
+	ListInvitations(ctx context.Context, workspaceUID, workspaceSlug string) ([]WorkspaceInvitation, error)
+	RevokeInvitation(ctx context.Context, workspaceUID, workspaceSlug, invitationUID string) (WorkspaceInvitation, error)
+	ListDatabases(ctx context.Context, workspace string) ([]Database, error)
+	DeleteDatabase(ctx context.Context, workspace, dbUID, idempotency string) (DatabaseOperationResult, error)
 }
 
 var _ ClientAPI = (*Client)(nil)

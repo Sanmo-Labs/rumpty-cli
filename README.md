@@ -100,6 +100,14 @@ Add `--watch` to keep syncing as files change, or `--daemon` to do the same in a
 | `expose` / `unexpose` | Add or remove a public URL for a VM service |
 | `vm` | Manage workspace VMs: `ls`, `start`, `stop`, `reboot`, `delete` |
 | `workspaces` | List workspaces you can access |
+| `ws invitations` | List or revoke pending workspace invitations |
+| `db rm` | Delete a managed database (asks for confirmation) |
+| `ssh-key` | Add or remove SSH public keys on your account |
+| `api-key` | Revoke one of your API keys |
+| `bucket objects` | List or delete objects in a bucket |
+| `firewall` | Create or delete firewall policies |
+| `volume` | Create or delete volumes |
+| `k8s` | Delete Kubernetes clusters |
 | `completion` | Generate shell autocompletion script |
 
 Use `rumpty [command] --help` for details on any command.
