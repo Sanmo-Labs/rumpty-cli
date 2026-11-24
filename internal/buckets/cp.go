@@ -99,11 +99,12 @@ func downloadFile(ctx context.Context, readURL, localPath string) (int64, error)
 	if copyErr == nil {
 		copyErr = tmp.Close()
 	} else {
-		tmp.Close()
+		_ = tmp.Close()
 	}
 	if copyErr != nil {
 		return 0, copyErr
 	}
+	////nolint:gosec // G703: the local path is caller-supplied by design; the file is written to a temp file in its own directory and renamed
 	if err := os.Rename(tmpName, localPath); err != nil {
 		return 0, err
 	}
