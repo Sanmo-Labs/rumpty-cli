@@ -96,3 +96,20 @@ func (c *Client) CreateAssetAccessKey(ctx context.Context, workspace, bucketUID 
 	})
 	return data, err
 }
+
+// ListAssetAccessKeys lists a bucket's S3 access keys.
+func (c *Client) ListAssetAccessKeys(ctx context.Context, workspace, bucketUID string) ([]AssetAccessKey, error) {
+	var data []AssetAccessKey
+	opts := requestOptions{
+		headers: map[string]string{
+			headerWorkspaceSlug: workspace,
+		},
+	}
+	if err := c.getWithOptions(ctx, "/v1/asset-buckets/"+url.PathEscape(bucketUID)+"/access-keys", &data, opts); err != nil {
+		return nil, err
+	}
+	if data == nil {
+		return []AssetAccessKey{}, nil
+	}
+	return data, nil
+}
