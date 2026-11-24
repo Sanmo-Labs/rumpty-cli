@@ -69,16 +69,17 @@ func writeKubeconfigFile(path string, content []byte) error {
 	tmpName := tmp.Name()
 	defer os.Remove(tmpName)
 	if err := tmp.Chmod(0o600); err != nil {
-		tmp.Close()
+		_ = tmp.Close()
 		return fmt.Errorf("writing %s: %w", path, err)
 	}
 	if _, err := tmp.Write(content); err != nil {
-		tmp.Close()
+		_ = tmp.Close()
 		return fmt.Errorf("writing %s: %w", path, err)
 	}
 	if err := tmp.Close(); err != nil {
 		return fmt.Errorf("writing %s: %w", path, err)
 	}
+	////nolint:gosec // G703: the output path is caller-supplied by design; the file is written to a temp file in its own directory and renamed
 	if err := os.Rename(tmpName, path); err != nil {
 		return fmt.Errorf("writing %s: %w", path, err)
 	}
