@@ -176,11 +176,13 @@ func newMCPCmd(rt *app.Runtime) *cobra.Command {
 		Short: "Show how to connect an AI client to Rumpty MCP",
 		Long: "Print the Rumpty MCP server details and setup steps for an MCP client.\n\n" +
 			"Clients: " + strings.Join(ids, ", ") + ".\n\n" +
-			"Where a client supports it, the steps read your API key from $" + config.EnvToken + ". This command never prints a key.",
+			"Where a client supports it, the steps read your API key from $" + config.EnvToken + ". This command never prints a key.\n\n" +
+			"To write the config for you, use rumpty mcp install <client>.",
 		Example: `  rumpty mcp
   rumpty mcp cursor
   rumpty mcp claude-code
-  rumpty mcp -o json`,
+  rumpty mcp -o json
+  rumpty mcp install cursor`,
 		Args:      cobra.MaximumNArgs(1),
 		ValidArgs: ids,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -188,17 +190,7 @@ func newMCPCmd(rt *app.Runtime) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			info := mcpInfo{
-				URL:        mcpURL,
-				Transport:  mcpTransport,
-				AuthHeader: "Authorization",
-				AuthScheme: "Bearer",
-				KeyEnv:     config.EnvToken,
-				KeySet:     strings.TrimSpace(os.Getenv(config.EnvToken)) != "",
-				CreateKey:  mcpKeysURL,
-				Docs:       mcpDocsURL,
-				Clients:    mcpClients,
-			}
+			info := newMCPInfo()
 			out := rt.Streams.Out
 			if len(args) == 1 {
 				client, ok := findMCPClient(args[0])
@@ -220,7 +212,22 @@ func newMCPCmd(rt *app.Runtime) *cobra.Command {
 		},
 	}
 	addOutputFlag(cmd, &output)
+	cmd.AddCommand(newMCPInstallCmd(rt))
 	return cmd
+}
+
+func newMCPInfo() mcpInfo {
+	return mcpInfo{
+		URL:        mcpURL,
+		Transport:  mcpTransport,
+		AuthHeader: "Authorization",
+		AuthScheme: "Bearer",
+		KeyEnv:     config.EnvToken,
+		KeySet:     strings.TrimSpace(os.Getenv(config.EnvToken)) != "",
+		CreateKey:  mcpKeysURL,
+		Docs:       mcpDocsURL,
+		Clients:    mcpClients,
+	}
 }
 
 func findMCPClient(id string) (mcpClient, bool) {
