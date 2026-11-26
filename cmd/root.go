@@ -87,6 +87,7 @@ func NewRoot(rt *app.Runtime) *cobra.Command {
 		newExecCmd(rt),
 		newCopyCmd(rt),
 		newSyncCmd(rt),
+		newLoadBalancersCmd(rt),
 		newMCPCmd(rt),
 	)
 

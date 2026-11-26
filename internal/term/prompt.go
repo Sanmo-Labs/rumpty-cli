@@ -40,3 +40,17 @@ func Password(errOut io.Writer, label string) (string, error) {
 	}
 	return strings.TrimSpace(string(bytes)), nil
 }
+
+// Confirm asks a yes/no question and returns true only for "y" or "yes".
+func Confirm(in io.Reader, errOut io.Writer, question string) (bool, error) {
+	answer, err := Line(in, errOut, question+" [y/N]", "")
+	if err != nil {
+		return false, err
+	}
+	switch strings.ToLower(answer) {
+	case "y", "yes":
+		return true, nil
+	default:
+		return false, nil
+	}
+}

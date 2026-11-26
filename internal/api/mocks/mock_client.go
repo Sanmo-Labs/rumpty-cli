@@ -41,6 +41,21 @@ func (m *MockClientAPI) EXPECT() *MockClientAPIMockRecorder {
 	return m.recorder
 }
 
+// AddLoadBalancerTargets mocks base method.
+func (m *MockClientAPI) AddLoadBalancerTargets(ctx context.Context, workspace, uid string, vmUIDs []string, idempotency string) (api.LoadBalancerOperationResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddLoadBalancerTargets", ctx, workspace, uid, vmUIDs, idempotency)
+	ret0, _ := ret[0].(api.LoadBalancerOperationResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AddLoadBalancerTargets indicates an expected call of AddLoadBalancerTargets.
+func (mr *MockClientAPIMockRecorder) AddLoadBalancerTargets(ctx, workspace, uid, vmUIDs, idempotency any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddLoadBalancerTargets", reflect.TypeOf((*MockClientAPI)(nil).AddLoadBalancerTargets), ctx, workspace, uid, vmUIDs, idempotency)
+}
+
 // CreateAssetAccessKey mocks base method.
 func (m *MockClientAPI) CreateAssetAccessKey(ctx context.Context, workspace, bucketUID string, req api.CreateAssetAccessKeyRequest) (api.CreateAssetAccessKeyResult, error) {
 	m.ctrl.T.Helper()
@@ -71,6 +86,36 @@ func (mr *MockClientAPIMockRecorder) CreateAssetBucket(ctx, workspace, req, idem
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAssetBucket", reflect.TypeOf((*MockClientAPI)(nil).CreateAssetBucket), ctx, workspace, req, idempotency)
 }
 
+// CreateLoadBalancer mocks base method.
+func (m *MockClientAPI) CreateLoadBalancer(ctx context.Context, workspace string, req *api.CreateLoadBalancerRequest, idempotency string) (api.LoadBalancerOperationResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateLoadBalancer", ctx, workspace, req, idempotency)
+	ret0, _ := ret[0].(api.LoadBalancerOperationResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateLoadBalancer indicates an expected call of CreateLoadBalancer.
+func (mr *MockClientAPIMockRecorder) CreateLoadBalancer(ctx, workspace, req, idempotency any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateLoadBalancer", reflect.TypeOf((*MockClientAPI)(nil).CreateLoadBalancer), ctx, workspace, req, idempotency)
+}
+
+// DeleteLoadBalancer mocks base method.
+func (m *MockClientAPI) DeleteLoadBalancer(ctx context.Context, workspace, uid, idempotency string) (api.LoadBalancerOperationResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteLoadBalancer", ctx, workspace, uid, idempotency)
+	ret0, _ := ret[0].(api.LoadBalancerOperationResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteLoadBalancer indicates an expected call of DeleteLoadBalancer.
+func (mr *MockClientAPIMockRecorder) DeleteLoadBalancer(ctx, workspace, uid, idempotency any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteLoadBalancer", reflect.TypeOf((*MockClientAPI)(nil).DeleteLoadBalancer), ctx, workspace, uid, idempotency)
+}
+
 // DeleteVM mocks base method.
 func (m *MockClientAPI) DeleteVM(ctx context.Context, workspace, vmUID, idempotency string) (api.VMOperationResult, error) {
 	m.ctrl.T.Helper()
@@ -99,6 +144,21 @@ func (m *MockClientAPI) ExposeVMApp(ctx context.Context, workspace, vmUID string
 func (mr *MockClientAPIMockRecorder) ExposeVMApp(ctx, workspace, vmUID, req, idempotency any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExposeVMApp", reflect.TypeOf((*MockClientAPI)(nil).ExposeVMApp), ctx, workspace, vmUID, req, idempotency)
+}
+
+// GetLoadBalancer mocks base method.
+func (m *MockClientAPI) GetLoadBalancer(ctx context.Context, workspace, uid string) (api.LoadBalancer, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetLoadBalancer", ctx, workspace, uid)
+	ret0, _ := ret[0].(api.LoadBalancer)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetLoadBalancer indicates an expected call of GetLoadBalancer.
+func (mr *MockClientAPIMockRecorder) GetLoadBalancer(ctx, workspace, uid any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLoadBalancer", reflect.TypeOf((*MockClientAPI)(nil).GetLoadBalancer), ctx, workspace, uid)
 }
 
 // GetOperation mocks base method.
@@ -144,6 +204,21 @@ func (m *MockClientAPI) ListAssetBuckets(ctx context.Context, workspace string) 
 func (mr *MockClientAPIMockRecorder) ListAssetBuckets(ctx, workspace any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAssetBuckets", reflect.TypeOf((*MockClientAPI)(nil).ListAssetBuckets), ctx, workspace)
+}
+
+// ListLoadBalancers mocks base method.
+func (m *MockClientAPI) ListLoadBalancers(ctx context.Context, workspace string) ([]api.LoadBalancer, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListLoadBalancers", ctx, workspace)
+	ret0, _ := ret[0].([]api.LoadBalancer)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListLoadBalancers indicates an expected call of ListLoadBalancers.
+func (mr *MockClientAPIMockRecorder) ListLoadBalancers(ctx, workspace any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListLoadBalancers", reflect.TypeOf((*MockClientAPI)(nil).ListLoadBalancers), ctx, workspace)
 }
 
 // ListVMApps mocks base method.
@@ -264,6 +339,21 @@ func (mr *MockClientAPIMockRecorder) RebootVM(ctx, workspace, vmUID, idempotency
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RebootVM", reflect.TypeOf((*MockClientAPI)(nil).RebootVM), ctx, workspace, vmUID, idempotency)
 }
 
+// RemoveLoadBalancerTarget mocks base method.
+func (m *MockClientAPI) RemoveLoadBalancerTarget(ctx context.Context, workspace, uid, vmUID, idempotency string) (api.LoadBalancerOperationResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemoveLoadBalancerTarget", ctx, workspace, uid, vmUID, idempotency)
+	ret0, _ := ret[0].(api.LoadBalancerOperationResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RemoveLoadBalancerTarget indicates an expected call of RemoveLoadBalancerTarget.
+func (mr *MockClientAPIMockRecorder) RemoveLoadBalancerTarget(ctx, workspace, uid, vmUID, idempotency any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveLoadBalancerTarget", reflect.TypeOf((*MockClientAPI)(nil).RemoveLoadBalancerTarget), ctx, workspace, uid, vmUID, idempotency)
+}
+
 // RevokeAssetAccessKey mocks base method.
 func (m *MockClientAPI) RevokeAssetAccessKey(ctx context.Context, workspace, keyUID string) error {
 	m.ctrl.T.Helper()
@@ -336,4 +426,19 @@ func (m *MockClientAPI) UnexposeVMApp(ctx context.Context, workspace, vmUID, app
 func (mr *MockClientAPIMockRecorder) UnexposeVMApp(ctx, workspace, vmUID, app, idempotency any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnexposeVMApp", reflect.TypeOf((*MockClientAPI)(nil).UnexposeVMApp), ctx, workspace, vmUID, app, idempotency)
+}
+
+// UpdateLoadBalancer mocks base method.
+func (m *MockClientAPI) UpdateLoadBalancer(ctx context.Context, workspace, uid string, req *api.UpdateLoadBalancerRequest, idempotency string) (api.LoadBalancerOperationResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateLoadBalancer", ctx, workspace, uid, req, idempotency)
+	ret0, _ := ret[0].(api.LoadBalancerOperationResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateLoadBalancer indicates an expected call of UpdateLoadBalancer.
+func (mr *MockClientAPIMockRecorder) UpdateLoadBalancer(ctx, workspace, uid, req, idempotency any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateLoadBalancer", reflect.TypeOf((*MockClientAPI)(nil).UpdateLoadBalancer), ctx, workspace, uid, req, idempotency)
 }

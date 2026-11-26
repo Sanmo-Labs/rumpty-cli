@@ -96,6 +96,23 @@ func (c *Client) post(ctx context.Context, path string, body any, out any, opts 
 	return decodeEnvelope(resp, out)
 }
 
+func (c *Client) patch(ctx context.Context, path string, body any, out any, opts requestOptions) error {
+	if c.err != nil {
+		return c.err
+	}
+	req := c.r.R().SetContext(ctx).SetBody(body)
+	for k, v := range opts.headers {
+		req.SetHeader(k, v)
+	}
+	rumptylog.Debug("API request", "method", "PATCH", "path", path)
+	resp, err := req.Patch(path)
+	if err != nil {
+		return TransportError(err)
+	}
+	rumptylog.Debug("API response", "method", "PATCH", "path", path, "status", resp.StatusCode())
+	return decodeEnvelope(resp, out)
+}
+
 func (c *Client) deleteWithOptions(ctx context.Context, path string, out any, opts requestOptions) error {
 	if c.err != nil {
 		return c.err
