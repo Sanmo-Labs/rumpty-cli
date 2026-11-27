@@ -52,6 +52,13 @@ func Traffic(ctx context.Context, rt *app.Runtime, ref, window string, format te
 	}
 	field("Load balancer", term.Bold(w, lbName(&found)))
 	field("Health", healthSummary(w, &health))
+	for _, t := range health.Targets {
+		line := fmt.Sprintf("  %-15s%s", orDefault(t.VMName, t.VMUID), targetState(w, t.State))
+		if r := strings.TrimSpace(t.Reason); r != "" {
+			line += term.Muted(w, " ("+r+")")
+		}
+		fmt.Fprintln(w, line)
+	}
 	fmt.Fprintln(w)
 
 	if !traffic.Available {
@@ -105,6 +112,30 @@ func healthSummary(w io.Writer, h *api.LoadBalancerHealth) string {
 		return line
 	default:
 		return term.Muted(w, h.Status)
+	}
+}
+
+// targetHealth is a target's cell in the `lb get` table; "—" when the
+// server sends no per-target health.
+func targetHealth(w io.Writer, h *api.LoadBalancerHealth, vmUID string) string {
+	for _, t := range h.Targets {
+		if t.VMUID == vmUID {
+			return targetState(w, t.State)
+		}
+	}
+	return "—"
+}
+
+func targetState(w io.Writer, state string) string {
+	switch state {
+	case "healthy":
+		return term.StatusBadge(w, "healthy")
+	case "unhealthy":
+		return term.StatusBadge(w, "unhealthy")
+	case "", "unknown":
+		return term.Muted(w, "unknown")
+	default:
+		return term.StatusBadge(w, state)
 	}
 }
 

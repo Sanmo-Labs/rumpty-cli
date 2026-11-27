@@ -173,3 +173,52 @@ func TestTraffic_numberFormatting(t *testing.T) {
 		}
 	}
 }
+
+func perTargetHealth() api.LoadBalancerHealth {
+	return api.LoadBalancerHealth{
+		Status: "degraded", HealthyTargets: 1, TotalTargets: 2,
+		Targets: []api.LoadBalancerTargetHealth{
+			{VMUID: "vm-1", VMName: "web-1", State: "healthy"},
+			{VMUID: "vm-2", VMName: "Web Two", State: "unhealthy", Reason: "failing health checks or returning errors"},
+		},
+	}
+}
+
+func TestGet_showsHealthPerTarget(t *testing.T) {
+	rt, mock, out := newRuntime(t)
+	gomock.InOrder(
+		mock.EXPECT().ListLoadBalancers(gomock.Any(), "acme").Return([]api.LoadBalancer{readyLB()}, nil),
+		mock.EXPECT().GetLoadBalancer(gomock.Any(), "acme", "lb-1").Return(readyLB(), nil),
+		mock.EXPECT().GetLoadBalancerHealth(gomock.Any(), "acme", "lb-1").Return(perTargetHealth(), nil),
+	)
+
+	require.NoError(t, lb.Get(context.Background(), rt, "web", term.OutputTable))
+	assert.Regexp(t, `TARGET\s+HEALTH\s+VM STATUS\s+VM UID`, out.String())
+	assert.Regexp(t, `web-1\s+healthy\s+running\s+vm-1`, out.String())
+	assert.Regexp(t, `Web Two\s+unhealthy\s+running\s+vm-2`, out.String())
+}
+
+func TestGet_olderServerWithoutTargetsShowsDash(t *testing.T) {
+	rt, mock, out := newRuntime(t)
+	gomock.InOrder(
+		mock.EXPECT().ListLoadBalancers(gomock.Any(), "acme").Return([]api.LoadBalancer{readyLB()}, nil),
+		mock.EXPECT().GetLoadBalancer(gomock.Any(), "acme", "lb-1").Return(readyLB(), nil),
+		mock.EXPECT().GetLoadBalancerHealth(gomock.Any(), "acme", "lb-1").Return(api.LoadBalancerHealth{Status: "healthy", HealthyTargets: 2, TotalTargets: 2}, nil),
+	)
+
+	require.NoError(t, lb.Get(context.Background(), rt, "web", term.OutputTable))
+	assert.Regexp(t, `web-1\s+—\s+running`, out.String())
+}
+
+func TestTraffic_listsTargets(t *testing.T) {
+	rt, mock, out := newRuntime(t)
+	gomock.InOrder(
+		mock.EXPECT().ListLoadBalancers(gomock.Any(), "acme").Return([]api.LoadBalancer{readyLB()}, nil),
+		mock.EXPECT().GetLoadBalancerTraffic(gomock.Any(), "acme", "lb-1", "1h").Return(liveTraffic(), nil),
+		mock.EXPECT().GetLoadBalancerHealth(gomock.Any(), "acme", "lb-1").Return(perTargetHealth(), nil),
+	)
+
+	require.NoError(t, lb.Traffic(context.Background(), rt, "web", "1h", term.OutputTable))
+	assert.Contains(t, out.String(), "  web-1          healthy\n")
+	assert.Contains(t, out.String(), "  Web Two        unhealthy (failing health checks or returning errors)\n")
+}

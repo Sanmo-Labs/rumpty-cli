@@ -88,10 +88,11 @@ func Get(ctx context.Context, rt *app.Runtime, ref string, format term.OutputFor
 		fmt.Fprintln(w, "No targets.")
 		return nil
 	}
-	targets := term.NewTable(w, "TARGET", "VM STATUS", "VM UID")
+	targets := term.NewTable(w, "TARGET", "HEALTH", "VM STATUS", "VM UID")
 	for i := range lb.Targets {
 		targets.Row(
 			orDash(lb.Targets[i].VMName),
+			targetHealth(w, &health, lb.Targets[i].VMUID),
 			term.StatusBadge(w, orDash(lb.Targets[i].VMStatus)),
 			lb.Targets[i].VMUID,
 		)

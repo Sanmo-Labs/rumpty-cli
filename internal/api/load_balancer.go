@@ -181,12 +181,22 @@ type LoadBalancerTraffic struct {
 // LoadBalancerHealth mirrors GET /v1/load-balancers/:uid/health. Status is
 // healthy, degraded, down, no_targets or unknown.
 type LoadBalancerHealth struct {
-	LoadBalancerUID   string `json:"load_balancer_uid"`
-	Status            string `json:"status"`
-	HealthyTargets    int    `json:"healthy_targets"`
-	TotalTargets      int    `json:"total_targets"`
-	CheckedAt         string `json:"checked_at"`
-	UnavailableReason string `json:"unavailable_reason,omitempty"`
+	LoadBalancerUID   string                     `json:"load_balancer_uid"`
+	Status            string                     `json:"status"`
+	HealthyTargets    int                        `json:"healthy_targets"`
+	TotalTargets      int                        `json:"total_targets"`
+	CheckedAt         string                     `json:"checked_at"`
+	UnavailableReason string                     `json:"unavailable_reason,omitempty"`
+	Targets           []LoadBalancerTargetHealth `json:"targets,omitempty"`
+}
+
+// LoadBalancerTargetHealth is one target's health: healthy, unhealthy,
+// starting, stopped or unknown. Older servers don't send it.
+type LoadBalancerTargetHealth struct {
+	VMUID  string `json:"vm_uid"`
+	VMName string `json:"vm_name"`
+	State  string `json:"state"`
+	Reason string `json:"reason,omitempty"`
 }
 
 func (c *Client) GetLoadBalancerTraffic(ctx context.Context, workspace, uid, window string) (LoadBalancerTraffic, error) {
