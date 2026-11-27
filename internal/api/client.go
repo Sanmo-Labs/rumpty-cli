@@ -154,6 +154,14 @@ func (c *Client) getWithOptions(ctx context.Context, path string, out any, opts 
 func decodeEnvelope(resp *resty.Response, out any) error {
 	var env envelope
 	if err := json.Unmarshal(resp.Body(), &env); err != nil {
+		if resp.IsError() {
+			// Not our API's JSON: an older server without this route, or a
+			// proxy error page. Say so instead of surfacing a JSON error.
+			return &Error{
+				StatusCode: resp.StatusCode(),
+				Message:    fmt.Sprintf("the API returned %s without details; it may not support this command yet", resp.Status()),
+			}
+		}
 		return fmt.Errorf("decode response: %w", err)
 	}
 

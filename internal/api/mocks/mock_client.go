@@ -161,6 +161,36 @@ func (mr *MockClientAPIMockRecorder) GetLoadBalancer(ctx, workspace, uid any) *g
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLoadBalancer", reflect.TypeOf((*MockClientAPI)(nil).GetLoadBalancer), ctx, workspace, uid)
 }
 
+// GetLoadBalancerHealth mocks base method.
+func (m *MockClientAPI) GetLoadBalancerHealth(ctx context.Context, workspace, uid string) (api.LoadBalancerHealth, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetLoadBalancerHealth", ctx, workspace, uid)
+	ret0, _ := ret[0].(api.LoadBalancerHealth)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetLoadBalancerHealth indicates an expected call of GetLoadBalancerHealth.
+func (mr *MockClientAPIMockRecorder) GetLoadBalancerHealth(ctx, workspace, uid any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLoadBalancerHealth", reflect.TypeOf((*MockClientAPI)(nil).GetLoadBalancerHealth), ctx, workspace, uid)
+}
+
+// GetLoadBalancerTraffic mocks base method.
+func (m *MockClientAPI) GetLoadBalancerTraffic(ctx context.Context, workspace, uid, window string) (api.LoadBalancerTraffic, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetLoadBalancerTraffic", ctx, workspace, uid, window)
+	ret0, _ := ret[0].(api.LoadBalancerTraffic)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetLoadBalancerTraffic indicates an expected call of GetLoadBalancerTraffic.
+func (mr *MockClientAPIMockRecorder) GetLoadBalancerTraffic(ctx, workspace, uid, window any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLoadBalancerTraffic", reflect.TypeOf((*MockClientAPI)(nil).GetLoadBalancerTraffic), ctx, workspace, uid, window)
+}
+
 // GetOperation mocks base method.
 func (m *MockClientAPI) GetOperation(ctx context.Context, workspace, operationID string) (api.Operation, error) {
 	m.ctrl.T.Helper()

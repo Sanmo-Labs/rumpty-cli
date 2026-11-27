@@ -346,12 +346,14 @@ func TestGet_detailsAndJSON(t *testing.T) {
 	gomock.InOrder(
 		mock.EXPECT().ListLoadBalancers(gomock.Any(), "acme").Return([]api.LoadBalancer{readyLB()}, nil),
 		mock.EXPECT().GetLoadBalancer(gomock.Any(), "acme", "lb-1").Return(readyLB(), nil),
+		mock.EXPECT().GetLoadBalancerHealth(gomock.Any(), "acme", "lb-1").Return(api.LoadBalancerHealth{Status: "degraded", HealthyTargets: 1, TotalTargets: 2}, nil),
 		mock.EXPECT().ListLoadBalancers(gomock.Any(), "acme").Return([]api.LoadBalancer{readyLB()}, nil),
 		mock.EXPECT().GetLoadBalancer(gomock.Any(), "acme", "lb-1").Return(readyLB(), nil),
 	)
 
 	require.NoError(t, lb.Get(context.Background(), rt, "web", term.OutputTable))
 	for _, want := range []string{
+		"Health:          degraded (1/2 targets healthy)",
 		"HTTP on port 8080",
 		"HTTP /healthz on port 8080 every 10s, timeout 5s, healthy after 3, unhealthy after 3",
 		"Sticky sessions: off",
