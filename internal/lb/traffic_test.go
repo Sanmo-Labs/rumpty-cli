@@ -219,6 +219,29 @@ func TestTraffic_listsTargets(t *testing.T) {
 	)
 
 	require.NoError(t, lb.Traffic(context.Background(), rt, "web", "1h", term.OutputTable))
-	assert.Contains(t, out.String(), "  web-1          healthy\n")
-	assert.Contains(t, out.String(), "  Web Two        unhealthy (failing health checks or returning errors)\n")
+	assert.Contains(t, out.String(), "  web-1    healthy\n")
+	assert.Contains(t, out.String(), "  Web Two  unhealthy (failing health checks or returning errors)\n")
+}
+
+func TestGet_fallbackInfersOnlyWhatTheCountsProve(t *testing.T) {
+	for _, tc := range []struct {
+		status string
+		want   string
+	}{
+		{"healthy", `web-1\s+healthy\s+running`},
+		{"down", `web-1\s+unhealthy\s+running`},
+		{"degraded", `web-1\s+unknown\s+running`},
+	} {
+		rt, mock, out := newRuntime(t)
+		gomock.InOrder(
+			mock.EXPECT().ListLoadBalancers(gomock.Any(), "acme").Return([]api.LoadBalancer{readyLB()}, nil),
+			mock.EXPECT().GetLoadBalancer(gomock.Any(), "acme", "lb-1").Return(readyLB(), nil),
+			mock.EXPECT().GetLoadBalancerHealth(gomock.Any(), "acme", "lb-1").Return(api.LoadBalancerHealth{
+				Status: tc.status, TotalTargets: 2,
+				Targets: []api.LoadBalancerTargetHealth{{VMUID: "vm-1", VMName: "web-1", State: "unknown"}, {VMUID: "vm-2", VMName: "Web Two", State: "unknown"}},
+			}, nil),
+		)
+		require.NoError(t, lb.Get(context.Background(), rt, "web", term.OutputTable))
+		assert.Regexp(t, tc.want, out.String(), tc.status)
+	}
 }

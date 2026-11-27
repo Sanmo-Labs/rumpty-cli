@@ -52,8 +52,12 @@ func Traffic(ctx context.Context, rt *app.Runtime, ref, window string, format te
 	}
 	field("Load balancer", term.Bold(w, lbName(&found)))
 	field("Health", healthSummary(w, &health))
+	width := 0
 	for _, t := range health.Targets {
-		line := fmt.Sprintf("  %-15s%s", orDefault(t.VMName, t.VMUID), targetState(w, t.State))
+		width = max(width, len(orDefault(t.VMName, t.VMUID)))
+	}
+	for _, t := range health.Targets {
+		line := fmt.Sprintf("  %-*s  %s", width, orDefault(t.VMName, t.VMUID), targetState(w, inferredState(&health, t.State)))
 		if r := strings.TrimSpace(t.Reason); r != "" {
 			line += term.Muted(w, " ("+r+")")
 		}
@@ -120,10 +124,28 @@ func healthSummary(w io.Writer, h *api.LoadBalancerHealth) string {
 func targetHealth(w io.Writer, h *api.LoadBalancerHealth, vmUID string) string {
 	for _, t := range h.Targets {
 		if t.VMUID == vmUID {
-			return targetState(w, t.State)
+			return targetState(w, inferredState(h, t.State))
 		}
 	}
 	return "—"
+}
+
+// inferredState fills in an "unknown" target from the load balancer's
+// counts, the same way the console does, but only when the counts prove
+// it: every running target healthy, or none. The server sends "unknown"
+// for running targets when per-target data is unavailable.
+func inferredState(h *api.LoadBalancerHealth, state string) string {
+	if state != "unknown" {
+		return state
+	}
+	switch h.Status {
+	case "healthy":
+		return "healthy"
+	case "down":
+		return "unhealthy"
+	default:
+		return state
+	}
 }
 
 func targetState(w io.Writer, state string) string {
