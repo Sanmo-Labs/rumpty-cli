@@ -59,18 +59,20 @@ func Get(ctx context.Context, rt *app.Runtime, ref string, format term.OutputFor
 	if err != nil {
 		return fmt.Errorf("get load balancer %s: %w", lbName(&found), err)
 	}
-	spin.Stop()
-
 	w := rt.Streams.Out
 	if format == term.OutputJSON {
+		spin.Stop()
 		return term.WriteJSON(w, lb)
 	}
+	health := loadHealth(ctx, rt, workspace, lb.UID)
+	spin.Stop()
 
 	field := func(label, value string) {
 		fmt.Fprintf(w, "%-17s%s\n", label+":", value)
 	}
 	field("Name", term.Bold(w, lbName(&lb)))
 	field("Status", term.StatusBadge(w, orDash(lb.Status)))
+	field("Health", healthSummary(w, &health))
 	if s := strings.TrimSpace(lb.LastFailure); s != "" {
 		field("Last failure", term.Error(w, s))
 	}
@@ -86,10 +88,11 @@ func Get(ctx context.Context, rt *app.Runtime, ref string, format term.OutputFor
 		fmt.Fprintln(w, "No targets.")
 		return nil
 	}
-	targets := term.NewTable(w, "TARGET", "VM STATUS", "VM UID")
+	targets := term.NewTable(w, "TARGET", "HEALTH", "VM STATUS", "VM UID")
 	for i := range lb.Targets {
 		targets.Row(
 			orDash(lb.Targets[i].VMName),
+			targetHealth(w, &health, lb.Targets[i].VMUID),
 			term.StatusBadge(w, orDash(lb.Targets[i].VMStatus)),
 			lb.Targets[i].VMUID,
 		)

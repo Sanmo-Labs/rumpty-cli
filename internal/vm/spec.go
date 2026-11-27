@@ -27,7 +27,7 @@ func formatSpec(v *api.VM) string {
 		parts = append(parts, fmt.Sprintf("%dGiB disk", v.DiskGiB))
 	}
 	if z := strings.TrimSpace(v.ZoneSlug); z != "" {
-		parts = append(parts, z)
+		parts = append(parts, zoneLabel(z))
 	}
 	if osName != "" {
 		parts = append(parts, osName)
@@ -50,4 +50,14 @@ func formatMemory(mib int) string {
 		return fmt.Sprintf("%dGiB", mib/1024)
 	}
 	return fmt.Sprintf("%dMiB", mib)
+}
+
+// zoneLabel is what people read for a zone; the API identifier is unchanged.
+func zoneLabel(slug string) string {
+	switch strings.ToLower(slug) {
+	case "olas-closet", "olascloset":
+		return "LOS1 (Lagos)"
+	default:
+		return slug
+	}
 }

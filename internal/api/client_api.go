@@ -18,6 +18,8 @@ type ClientAPI interface {
 	UnexposeVMApp(ctx context.Context, workspace, vmUID, app string, idempotency string) (UnexposeVMAppResult, error)
 	ListLoadBalancers(ctx context.Context, workspace string) ([]LoadBalancer, error)
 	GetLoadBalancer(ctx context.Context, workspace, uid string) (LoadBalancer, error)
+	GetLoadBalancerTraffic(ctx context.Context, workspace, uid, window string) (LoadBalancerTraffic, error)
+	GetLoadBalancerHealth(ctx context.Context, workspace, uid string) (LoadBalancerHealth, error)
 	CreateLoadBalancer(ctx context.Context, workspace string, req *CreateLoadBalancerRequest, idempotency string) (LoadBalancerOperationResult, error)
 	UpdateLoadBalancer(ctx context.Context, workspace, uid string, req *UpdateLoadBalancerRequest, idempotency string) (LoadBalancerOperationResult, error)
 	DeleteLoadBalancer(ctx context.Context, workspace, uid, idempotency string) (LoadBalancerOperationResult, error)

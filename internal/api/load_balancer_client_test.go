@@ -170,3 +170,58 @@ func TestClient_CreateLoadBalancer_conflict(t *testing.T) {
 	_, err := api.NewClient(srv.URL, "tok").CreateLoadBalancer(context.Background(), "acme", &api.CreateLoadBalancerRequest{Name: "web"}, "k")
 	require.ErrorContains(t, err, "already exists")
 }
+
+func TestClient_GetLoadBalancerTraffic(t *testing.T) {
+	t.Parallel()
+
+	var path, window, workspace string
+	srv := newTestServer(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		path, window, workspace = r.URL.Path, r.URL.Query().Get("range"), r.Header.Get("X-Workspace-Slug")
+		writeJSON(t, w, http.StatusOK, apiEnvelope(true, "ok", "", json.RawMessage(`{
+			"load_balancer_uid":"lb-1","available":true,"range":"24h","step_seconds":1440,
+			"requests_total":10,"errors_total":1,"client_errors_total":null,"error_rate":0.1,
+			"avg_latency_ms":12.5,"rx_bytes":1,"tx_bytes":2,"points":[{"timestamp":"2026-11-27T10:00:00Z","requests":10,"errors":1}]}`)))
+	}))
+
+	got, err := api.NewClient(srv.URL, "tok").GetLoadBalancerTraffic(context.Background(), "acme", "lb-1", "24h")
+	require.NoError(t, err)
+	assert.Equal(t, "/v1/load-balancers/lb-1/traffic", path)
+	assert.Equal(t, "24h", window)
+	assert.Equal(t, "acme", workspace)
+	assert.Nil(t, got.ClientErrorsTotal, "null stays nil, not a false zero")
+	require.NotNil(t, got.AvgLatencyMs)
+	assert.InDelta(t, 12.5, *got.AvgLatencyMs, 1e-9)
+	require.Len(t, got.Points, 1)
+}
+
+func TestClient_GetLoadBalancerHealth(t *testing.T) {
+	t.Parallel()
+
+	var path, workspace string
+	srv := newTestServer(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		path, workspace = r.URL.Path, r.Header.Get("X-Workspace-Slug")
+		writeJSON(t, w, http.StatusOK, apiEnvelope(true, "ok", "", json.RawMessage(`{
+			"load_balancer_uid":"lb-1","status":"degraded","healthy_targets":1,"total_targets":2,"checked_at":"2026-11-27T10:00:00Z"}`)))
+	}))
+
+	got, err := api.NewClient(srv.URL, "tok").GetLoadBalancerHealth(context.Background(), "acme", "lb-1")
+	require.NoError(t, err)
+	assert.Equal(t, "/v1/load-balancers/lb-1/health", path)
+	assert.Equal(t, "acme", workspace)
+	assert.Equal(t, api.LoadBalancerHealth{LoadBalancerUID: "lb-1", Status: "degraded", HealthyTargets: 1, TotalTargets: 2, CheckedAt: "2026-11-27T10:00:00Z"}, got)
+}
+
+func TestClient_GetLoadBalancerHealth_olderServerWithoutRoute(t *testing.T) {
+	t.Parallel()
+
+	srv := newTestServer(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+		_, _ = w.Write([]byte("404 page not found"))
+	}))
+
+	_, err := api.NewClient(srv.URL, "tok").GetLoadBalancerHealth(context.Background(), "acme", "lb-1")
+	var apiErr *api.Error
+	require.ErrorAs(t, err, &apiErr)
+	assert.Equal(t, http.StatusNotFound, apiErr.StatusCode)
+	assert.Contains(t, err.Error(), "may not support this command yet")
+}
