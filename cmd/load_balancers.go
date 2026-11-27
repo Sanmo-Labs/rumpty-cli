@@ -25,6 +25,7 @@ the health check, round robin, or pinned to one VM with sticky sessions.
 		Example: `  rumpty lb ls
   rumpty lb create web --vm web-1 --vm web-2 --port 8080 --health-path /healthz
   rumpty lb get web
+  rumpty lb traffic web --range 24h
   rumpty lb add-target web web-3
   rumpty lb remove-target web web-1
   rumpty lb update web --sticky --allow 203.0.113.0/24
@@ -40,6 +41,7 @@ the health check, round robin, or pinned to one VM with sticky sessions.
 	cmd.AddCommand(
 		newLBListCmd(rt),
 		newLBGetCmd(rt),
+		newLBTrafficCmd(rt),
 		newLBCreateCmd(rt),
 		newLBUpdateCmd(rt),
 		newLBDeleteCmd(rt),
@@ -93,6 +95,35 @@ func newLBGetCmd(rt *app.Runtime) *cobra.Command {
 			return lb.Get(cmd.Context(), rt, args[0], format)
 		},
 	}
+	addOutputFlag(cmd, &output)
+	return cmd
+}
+
+func newLBTrafficCmd(rt *app.Runtime) *cobra.Command {
+	var output, window string
+	cmd := &cobra.Command{
+		Use:   "traffic <load-balancer>",
+		Short: "Show live health and request traffic for a load balancer",
+		Long: `Show whether the load balancer's targets are healthy right now, and the
+requests, errors, response time and bandwidth it served over a time range.`,
+		Example: `  rumpty lb traffic web
+  rumpty lb traffic web --range 7d
+  rumpty lb traffic web -o json`,
+		Args:              exactArgs(1, "missing load balancer name"),
+		ValidArgsFunction: completeLoadBalancerNames(rt),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			format, err := outputFormat(output)
+			if err != nil {
+				return err
+			}
+			if err := rt.Config.ValidateForSSH(); err != nil {
+				return config.NewUsageError("%v", err)
+			}
+			return lb.Traffic(cmd.Context(), rt, args[0], window, format)
+		},
+	}
+	cmd.Flags().StringVar(&window, "range", "1h", "Time range: "+strings.Join(lb.TrafficRanges, ", "))
+	_ = cmd.RegisterFlagCompletionFunc("range", cobra.FixedCompletions(lb.TrafficRanges, cobra.ShellCompDirectiveNoFileComp))
 	addOutputFlag(cmd, &output)
 	return cmd
 }

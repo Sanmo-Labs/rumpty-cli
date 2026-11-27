@@ -153,3 +153,61 @@ func (c *Client) RemoveLoadBalancerTarget(ctx context.Context, workspace, uid, v
 	err := c.deleteWithOptions(ctx, path, &data, workspaceRequestOptions(workspace, idempotency))
 	return data, err
 }
+
+type LoadBalancerTrafficPoint struct {
+	Timestamp string  `json:"timestamp"`
+	Requests  float64 `json:"requests"`
+	Errors    float64 `json:"errors"`
+}
+
+// LoadBalancerTraffic mirrors GET /v1/load-balancers/:uid/traffic.
+// ClientErrorsTotal and AvgLatencyMs are nil when the server could not read them.
+type LoadBalancerTraffic struct {
+	LoadBalancerUID   string                     `json:"load_balancer_uid"`
+	Available         bool                       `json:"available"`
+	Range             string                     `json:"range"`
+	StepSeconds       int                        `json:"step_seconds"`
+	RequestsTotal     int64                      `json:"requests_total"`
+	ErrorsTotal       int64                      `json:"errors_total"`
+	ClientErrorsTotal *int64                     `json:"client_errors_total"`
+	ErrorRate         float64                    `json:"error_rate"`
+	AvgLatencyMs      *float64                   `json:"avg_latency_ms"`
+	RXBytes           int64                      `json:"rx_bytes"`
+	TXBytes           int64                      `json:"tx_bytes"`
+	Points            []LoadBalancerTrafficPoint `json:"points"`
+	UnavailableReason string                     `json:"unavailable_reason,omitempty"`
+}
+
+// LoadBalancerHealth mirrors GET /v1/load-balancers/:uid/health. Status is
+// healthy, degraded, down, no_targets or unknown.
+type LoadBalancerHealth struct {
+	LoadBalancerUID   string                     `json:"load_balancer_uid"`
+	Status            string                     `json:"status"`
+	HealthyTargets    int                        `json:"healthy_targets"`
+	TotalTargets      int                        `json:"total_targets"`
+	CheckedAt         string                     `json:"checked_at"`
+	UnavailableReason string                     `json:"unavailable_reason,omitempty"`
+	Targets           []LoadBalancerTargetHealth `json:"targets,omitempty"`
+}
+
+// LoadBalancerTargetHealth is one target's health: healthy, unhealthy,
+// starting, stopped or unknown. Older servers don't send it.
+type LoadBalancerTargetHealth struct {
+	VMUID  string `json:"vm_uid"`
+	VMName string `json:"vm_name"`
+	State  string `json:"state"`
+	Reason string `json:"reason,omitempty"`
+}
+
+func (c *Client) GetLoadBalancerTraffic(ctx context.Context, workspace, uid, window string) (LoadBalancerTraffic, error) {
+	var data LoadBalancerTraffic
+	path := loadBalancerPath(uid, "traffic") + "?range=" + url.QueryEscape(window)
+	err := c.getWithOptions(ctx, path, &data, workspaceReadOptions(workspace))
+	return data, err
+}
+
+func (c *Client) GetLoadBalancerHealth(ctx context.Context, workspace, uid string) (LoadBalancerHealth, error) {
+	var data LoadBalancerHealth
+	err := c.getWithOptions(ctx, loadBalancerPath(uid, "health"), &data, workspaceReadOptions(workspace))
+	return data, err
+}
