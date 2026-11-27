@@ -43,5 +43,5 @@ func TestFormatSpec_fallback(t *testing.T) {
 		ImageName: "Ubuntu 24.04 LTS",
 	}
 	got := formatSpec(&v)
-	assert.Equal(t, "persistent · 20GiB disk · olas-closet · Ubuntu 24.04 LTS", got)
+	assert.Equal(t, "persistent · 20GiB disk · LOS1 (Lagos) · Ubuntu 24.04 LTS", got)
 }
