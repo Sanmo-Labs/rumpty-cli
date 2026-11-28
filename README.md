@@ -98,7 +98,7 @@ Add `--watch` to keep syncing as files change, or `--daemon` to do the same in a
 | `copy` (alias `cp`) | Copy files between your machine and a VM |
 | `exec` | Run a non-interactive command on a VM |
 | `expose` / `unexpose` | Add or remove a public URL for a VM service |
-| `vm` | Manage workspace VMs: `ls`, `start`, `stop`, `reboot`, `delete` |
+| `vm` | Manage workspace VMs: `ls`, `create`, `start`, `stop`, `reboot`, `delete` |
 | `load-balancer` (alias `lb`) | Put several VMs behind one HTTPS address: `ls`, `get`, `create`, `update`, `delete`, `add-target`, `remove-target` |
 | `workspaces` | List workspaces you can access |
 | `mcp` | Show how to connect Cursor, Claude Code, VS Code and other AI clients to Rumpty MCP; `mcp install <client>` writes the config for you |

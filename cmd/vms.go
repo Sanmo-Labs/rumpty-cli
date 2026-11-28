@@ -32,6 +32,7 @@ func newVMsCmd(rt *app.Runtime) *cobra.Command {
 
 	cmd.AddCommand(
 		newVMListCmd(rt),
+		newVMCreateCmd(rt),
 		newVMLifecycleCmd(rt, "start", "Start a stopped VM", vm.Start),
 		newVMLifecycleCmd(rt, "stop", "Stop a running VM", vm.Stop),
 		newVMLifecycleCmd(rt, "reboot", "Reboot a VM", vm.Reboot),

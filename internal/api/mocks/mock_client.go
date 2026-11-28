@@ -101,6 +101,21 @@ func (mr *MockClientAPIMockRecorder) CreateLoadBalancer(ctx, workspace, req, ide
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateLoadBalancer", reflect.TypeOf((*MockClientAPI)(nil).CreateLoadBalancer), ctx, workspace, req, idempotency)
 }
 
+// CreateVM mocks base method.
+func (m *MockClientAPI) CreateVM(ctx context.Context, workspace string, req *api.CreateVMRequest, idempotency string) (api.VMOperationResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateVM", ctx, workspace, req, idempotency)
+	ret0, _ := ret[0].(api.VMOperationResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateVM indicates an expected call of CreateVM.
+func (mr *MockClientAPIMockRecorder) CreateVM(ctx, workspace, req, idempotency any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateVM", reflect.TypeOf((*MockClientAPI)(nil).CreateVM), ctx, workspace, req, idempotency)
+}
+
 // DeleteLoadBalancer mocks base method.
 func (m *MockClientAPI) DeleteLoadBalancer(ctx context.Context, workspace, uid, idempotency string) (api.LoadBalancerOperationResult, error) {
 	m.ctrl.T.Helper()
