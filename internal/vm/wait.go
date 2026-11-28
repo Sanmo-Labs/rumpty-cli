@@ -19,40 +19,53 @@ const (
 // WaitForLifecycle polls until the action has taken effect, showing progress
 // on spin.
 func WaitForLifecycle(ctx context.Context, rt *app.Runtime, target *api.VM, action, operationID string, spin *term.Spinner) error {
-	if lifecycleReached(ctx, rt, target.Slug, action) {
-		return nil
+	name := target.Slug
+	if action == "create" {
+		name = target.Name
+	} else {
+		if lifecycleReached(ctx, rt, target.Slug, action) {
+			return nil
+		}
+		spin.Update(waitLabel(action, name))
 	}
-	spin.Update(waitLabel(action, target.Slug))
 
 	deadline := time.Now().Add(lifecyclePollTimeout)
 	ticker := time.NewTicker(lifecyclePollInterval)
 	defer ticker.Stop()
 
 	workspace := strings.TrimSpace(rt.Config.Workspace)
+	opID := strings.TrimSpace(operationID)
 
 	for {
 		if err := ctx.Err(); err != nil {
 			return err
 		}
 		if time.Now().After(deadline) {
-			return fmt.Errorf("timed out waiting for %s on %s", action, target.Slug)
+			return fmt.Errorf("timed out waiting for %s on %s", action, name)
 		}
 
-		if opID := strings.TrimSpace(operationID); opID != "" {
+		checkVM := opID == ""
+		if opID != "" {
 			op, err := rt.API().GetOperation(ctx, workspace, opID)
 			if err != nil {
 				return err
 			}
 			switch strings.ToLower(strings.TrimSpace(op.Status)) {
 			case "failed":
-				return fmt.Errorf("%s failed for %s", action, target.Slug)
+				return fmt.Errorf("%s failed for %s", action, name)
 			case "succeeded":
-				if lifecycleReached(ctx, rt, target.Slug, action) {
-					return nil
-				}
+				checkVM = true
 			}
-		} else if lifecycleReached(ctx, rt, target.Slug, action) {
-			return nil
+		}
+		if checkVM {
+			if action == "create" {
+				running, err := createdVMRunning(ctx, rt, workspace, target.UID)
+				if err != nil || running {
+					return err
+				}
+			} else if lifecycleReached(ctx, rt, target.Slug, action) {
+				return nil
+			}
 		}
 
 		select {
@@ -61,6 +74,26 @@ func WaitForLifecycle(ctx context.Context, rt *app.Runtime, target *api.VM, acti
 		case <-ticker.C:
 		}
 	}
+}
+
+func createdVMRunning(ctx context.Context, rt *app.Runtime, workspace, uid string) (bool, error) {
+	vms, err := rt.API().ListVMs(ctx, workspace)
+	if err != nil {
+		return false, err
+	}
+	for i := range vms {
+		if vms[i].UID != uid {
+			continue
+		}
+		switch status := vmDisplayStatus(&vms[i]); status {
+		case "running":
+			return true, nil
+		case "failed", "deleted", "deleting":
+			return false, fmt.Errorf("VM %s is %s", uid, status)
+		}
+		break
+	}
+	return false, nil
 }
 
 func lifecycleReached(ctx context.Context, rt *app.Runtime, slug, action string) bool {
@@ -98,7 +131,7 @@ func vmDisplayStatus(vm *api.VM) string {
 
 func waitLabel(action, slug string) string {
 	switch action {
-	case "start":
+	case "create", "start":
 		return fmt.Sprintf("Waiting for %s to start", slug)
 	case "stop":
 		return fmt.Sprintf("Waiting for %s to stop", slug)

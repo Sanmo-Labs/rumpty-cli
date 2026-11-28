@@ -50,6 +50,12 @@ func (c *Client) ListVMApps(ctx context.Context, workspace, vmUID string) ([]VMA
 	return data, nil
 }
 
+func (c *Client) CreateVM(ctx context.Context, workspace string, req *CreateVMRequest, idempotency string) (VMOperationResult, error) {
+	var data VMOperationResult
+	err := c.post(ctx, "/v1/vms", req, &data, workspaceRequestOptions(workspace, idempotency))
+	return data, err
+}
+
 func vmPath(vmUID, action string) string {
 	path := "/v1/vms/" + url.PathEscape(vmUID)
 	if action != "" {

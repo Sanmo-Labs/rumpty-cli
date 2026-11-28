@@ -56,6 +56,15 @@ type Operation struct {
 	EventsURL    string `json:"events_url"`
 }
 
+type CreateVMRequest struct {
+	Name       string   `json:"name"`
+	PlanSlug   string   `json:"plan_slug"`
+	ImageSlug  string   `json:"image_slug"`
+	VPCSlug    string   `json:"vpc_slug"`
+	ZoneSlug   string   `json:"zone_slug,omitempty"`
+	SSHKeyUIDs []string `json:"ssh_key_uids"`
+}
+
 type VMOperationResult struct {
 	OperationID string `json:"operation_id"`
 	VMUID       string `json:"vm_uid"`

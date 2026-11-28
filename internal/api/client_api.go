@@ -10,6 +10,7 @@ type ClientAPI interface {
 	ListWorkspaces(ctx context.Context) ([]Workspace, error)
 	ListVMs(ctx context.Context, workspace string) ([]VM, error)
 	ListVMApps(ctx context.Context, workspace, vmUID string) ([]VMApp, error)
+	CreateVM(ctx context.Context, workspace string, req *CreateVMRequest, idempotency string) (VMOperationResult, error)
 	StartVM(ctx context.Context, workspace, vmUID, idempotency string) (VMOperationResult, error)
 	StopVM(ctx context.Context, workspace, vmUID, idempotency string) (VMOperationResult, error)
 	RebootVM(ctx context.Context, workspace, vmUID, idempotency string) (VMOperationResult, error)
